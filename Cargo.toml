@@ -1,0 +1,13 @@
+[package]
+name = "mankai"
+version = "0.1.0"
+authors = ["grastello <gabriele.rastello@edu.unito.it>"]
+edition = "2018"
+
+[lib]
+name = "mankailib"
+path = "src/lib.rs"
+
+[[bin]]
+name = "mankairepl"
+path = "src/bin.rs"
