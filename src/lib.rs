@@ -29,6 +29,30 @@ impl Token {
     }
 }
 
+/// The lexer.
+struct Lexer {
+    /// The source code.
+    source: String,
+    /// The lexed tokens.
+    tokens: Vec<Token>,
+    /// Current token index.
+    current: usize,
+    /// Start of current lexeme.
+    start: usize,
+}
+
+impl Lexer {
+    /// Make a new lexer from some source code.
+    fn new(source: &str) -> Self {
+        Lexer {
+            source: String::from(source),
+            tokens: Vec::new(),
+            current: 0,
+            start: 0,
+        }
+    }
+}
+
 pub fn test_function() {
     println!("foo bar");
 }
