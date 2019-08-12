@@ -52,6 +52,40 @@ impl Lexer {
             start: 0,
         }
     }
+
+    /// Check if the lexer is at the end (or past the end) of the source code.
+    fn is_at_end(&self) -> bool {
+        self.current >= self.source.chars().count()
+    }
+
+    /// Advance the lexer.
+    fn advance(&mut self) -> char {
+        self.current += 1;
+        self.source.chars().nth(self.current - 1).unwrap()
+    }
+
+    /// Peek the next character without advancing the lexer.
+    fn peek(&self) -> char {
+        self.source.chars().nth(self.current).unwrap()
+    }
+}
+
+mod test {
+    use super::Lexer;
+
+    #[test]
+    fn lexer_initialization_and_basic_operations() {
+        let mut lexer = Lexer::new("(foo)");
+
+        assert_eq!(lexer.advance(), '(');
+        assert_eq!(lexer.advance(), 'f');
+        assert_eq!(lexer.advance(), 'o');
+        assert_eq!(lexer.advance(), 'o');
+        assert_eq!(lexer.peek(), ')');
+        assert_eq!(lexer.is_at_end(), false);
+        assert_eq!(lexer.advance(), ')');
+        assert_eq!(lexer.is_at_end(), true);
+    }
 }
 
 pub fn test_function() {
