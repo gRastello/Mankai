@@ -1,4 +1,5 @@
 /// Types of tokens.
+#[derive(Debug, PartialEq)]
 enum TokenKind {
     Plus,
     Minus,
@@ -13,6 +14,7 @@ enum TokenKind {
 }
 
 /// A token.
+#[derive(Debug, PartialEq)]
 struct Token {
     /// Corresponding lexeme.
     lexeme: String,
@@ -22,11 +24,8 @@ struct Token {
 
 impl Token {
     /// Create a new token from lexeme and kind.
-    fn new(lexeme: &str, kind: TokenKind) -> Self {
-        Token {
-            lexeme: String::from(lexeme),
-            kind,
-        }
+    fn new(lexeme: String, kind: TokenKind) -> Self {
+        Token { lexeme, kind }
     }
 }
 
@@ -68,10 +67,38 @@ impl Lexer {
     fn peek(&self) -> char {
         self.source.chars().nth(self.current).unwrap()
     }
+
+    /// Add a new token to the internal store with the given kind.
+    fn add_token(&mut self, kind: TokenKind) -> () {
+        let lexeme: String = self
+            .source
+            .chars()
+            .skip(self.start)
+            .take(self.current - self.start)
+            .collect();
+        self.tokens.push(Token::new(lexeme, kind));
+    }
+
+    /// Scan a new token.
+    fn scan_token(&mut self) -> () {
+        self.start = self.current;
+        let c = self.advance();
+
+        match c {
+            ' ' | '\t' | '\n' | '\r' => (),
+            '+' => self.add_token(TokenKind::Plus),
+            '-' => self.add_token(TokenKind::Minus),
+            '*' => self.add_token(TokenKind::Star),
+            '/' => self.add_token(TokenKind::Slash),
+            '(' => self.add_token(TokenKind::LeftParen),
+            ')' => self.add_token(TokenKind::RightParen),
+            _ => (),
+        }
+    }
 }
 
 mod test {
-    use super::Lexer;
+    use super::{Lexer, Token, TokenKind};
 
     #[test]
     fn lexer_initialization_and_basic_operations() {
@@ -85,6 +112,36 @@ mod test {
         assert_eq!(lexer.is_at_end(), false);
         assert_eq!(lexer.advance(), ')');
         assert_eq!(lexer.is_at_end(), true);
+    }
+
+    #[test]
+    fn lexing() {
+        let mut lexer = Lexer::new("(+-)*/");
+        let mut token;
+
+        lexer.scan_token();
+        token = lexer.tokens.pop().unwrap();
+        assert_eq!(token, Token::new(String::from("("), TokenKind::LeftParen));
+
+        lexer.scan_token();
+        token = lexer.tokens.pop().unwrap();
+        assert_eq!(token, Token::new(String::from("+"), TokenKind::Plus));
+
+        lexer.scan_token();
+        token = lexer.tokens.pop().unwrap();
+        assert_eq!(token, Token::new(String::from("-"), TokenKind::Minus));
+
+        lexer.scan_token();
+        token = lexer.tokens.pop().unwrap();
+        assert_eq!(token, Token::new(String::from(")"), TokenKind::RightParen));
+
+        lexer.scan_token();
+        token = lexer.tokens.pop().unwrap();
+        assert_eq!(token, Token::new(String::from("*"), TokenKind::Star));
+
+        lexer.scan_token();
+        token = lexer.tokens.pop().unwrap();
+        assert_eq!(token, Token::new(String::from("/"), TokenKind::Slash));
     }
 }
 
