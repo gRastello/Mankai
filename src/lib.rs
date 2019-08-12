@@ -6,6 +6,7 @@ enum TokenKind {
     Slash,
     String(String),
     Number(f64),
+    Identifier,
     LeftParen,
     RightParen,
     Eof,
