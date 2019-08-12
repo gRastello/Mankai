@@ -95,6 +95,13 @@ impl Lexer {
             _ => (),
         }
     }
+
+    /// Scan the entire source code.
+    fn scan(&mut self) -> () {
+        while !self.is_at_end() {
+            self.scan_token();
+        }
+    }
 }
 
 mod test {
@@ -119,29 +126,25 @@ mod test {
         let mut lexer = Lexer::new("(+-)*/");
         let mut token;
 
-        lexer.scan_token();
-        token = lexer.tokens.pop().unwrap();
-        assert_eq!(token, Token::new(String::from("("), TokenKind::LeftParen));
+        lexer.scan();
 
-        lexer.scan_token();
         token = lexer.tokens.pop().unwrap();
-        assert_eq!(token, Token::new(String::from("+"), TokenKind::Plus));
+        assert_eq!(token, Token::new(String::from("/"), TokenKind::Slash));
 
-        lexer.scan_token();
-        token = lexer.tokens.pop().unwrap();
-        assert_eq!(token, Token::new(String::from("-"), TokenKind::Minus));
-
-        lexer.scan_token();
-        token = lexer.tokens.pop().unwrap();
-        assert_eq!(token, Token::new(String::from(")"), TokenKind::RightParen));
-
-        lexer.scan_token();
         token = lexer.tokens.pop().unwrap();
         assert_eq!(token, Token::new(String::from("*"), TokenKind::Star));
 
-        lexer.scan_token();
         token = lexer.tokens.pop().unwrap();
-        assert_eq!(token, Token::new(String::from("/"), TokenKind::Slash));
+        assert_eq!(token, Token::new(String::from(")"), TokenKind::RightParen));
+
+        token = lexer.tokens.pop().unwrap();
+        assert_eq!(token, Token::new(String::from("-"), TokenKind::Minus));
+
+        token = lexer.tokens.pop().unwrap();
+        assert_eq!(token, Token::new(String::from("+"), TokenKind::Plus));
+
+        token = lexer.tokens.pop().unwrap();
+        assert_eq!(token, Token::new(String::from("("), TokenKind::LeftParen));
     }
 }
 
