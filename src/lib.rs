@@ -29,6 +29,24 @@ impl Token {
     }
 }
 
+/// A lexing error.
+struct ScanError {
+    /// Error message.
+    message: String,
+    /// Start of the problematic token.
+    position: usize,
+}
+
+impl ScanError {
+    /// Make a new lexing error.
+    fn new(message: &str, position: usize) -> Self {
+        ScanError {
+            message: String::from(message),
+            position,
+        }
+    }
+}
+
 /// The lexer.
 struct Lexer {
     /// The source code.
@@ -69,7 +87,7 @@ impl Lexer {
     }
 
     /// Add a new token to the internal store with the given kind.
-    fn add_token(&mut self, kind: TokenKind) -> () {
+    fn add_token(&mut self, kind: TokenKind) {
         let lexeme: String = self
             .source
             .chars()
@@ -79,28 +97,59 @@ impl Lexer {
         self.tokens.push(Token::new(lexeme, kind));
     }
 
+    /// Tokenize a string.
+    fn finish_string(&mut self) -> Result<(), ScanError> {
+        loop {
+            if self.is_at_end() {
+                return Err(ScanError::new("unfinished string", self.start));
+            }
+
+            let next = self.advance();
+
+            // Skip quoted characters, break if we hit the end of the string.
+            if next == '\\' {
+                self.current += 1;
+            } else if next == '"' {
+                break;
+            }
+        }
+
+        let string: String = self
+            .source
+            .chars()
+            .skip(self.start + 1)
+            .take(self.current - self.start - 2)
+            .collect();
+        self.add_token(TokenKind::String(string));
+
+        Ok(())
+    }
+
     /// Scan a new token.
-    fn scan_token(&mut self) -> () {
+    fn scan_token(&mut self) -> Result<(), ScanError> {
         self.start = self.current;
         let c = self.advance();
 
         match c {
-            ' ' | '\t' | '\n' | '\r' => (),
-            '+' => self.add_token(TokenKind::Plus),
-            '-' => self.add_token(TokenKind::Minus),
-            '*' => self.add_token(TokenKind::Star),
-            '/' => self.add_token(TokenKind::Slash),
-            '(' => self.add_token(TokenKind::LeftParen),
-            ')' => self.add_token(TokenKind::RightParen),
-            _ => (),
+            ' ' | '\t' | '\n' | '\r' => Ok(()),
+            '+' => Ok(self.add_token(TokenKind::Plus)),
+            '-' => Ok(self.add_token(TokenKind::Minus)),
+            '*' => Ok(self.add_token(TokenKind::Star)),
+            '/' => Ok(self.add_token(TokenKind::Slash)),
+            '(' => Ok(self.add_token(TokenKind::LeftParen)),
+            ')' => Ok(self.add_token(TokenKind::RightParen)),
+            '"' => self.finish_string(),
+            _ => Ok(()),
         }
     }
 
     /// Scan the entire source code.
-    fn scan(&mut self) -> () {
+    fn scan(&mut self) -> Result<(), ScanError> {
         while !self.is_at_end() {
-            self.scan_token();
+            self.scan_token()?;
         }
+
+        Ok(())
     }
 }
 
@@ -123,10 +172,22 @@ mod test {
 
     #[test]
     fn lexing() {
-        let mut lexer = Lexer::new("(+-)*/");
+        let mut lexer = Lexer::new("(+-) */   \n  \"foo\" +");
         let mut token;
 
         lexer.scan();
+
+        token = lexer.tokens.pop().unwrap();
+        assert_eq!(token, Token::new(String::from("+"), TokenKind::Plus));
+
+        token = lexer.tokens.pop().unwrap();
+        assert_eq!(
+            token,
+            Token::new(
+                String::from("\"foo\""),
+                TokenKind::String(String::from("foo"))
+            )
+        );
 
         token = lexer.tokens.pop().unwrap();
         assert_eq!(token, Token::new(String::from("/"), TokenKind::Slash));
