@@ -231,7 +231,7 @@ mod test {
 
     #[test]
     fn lexing() {
-        let mut lexer = Lexer::new("(bar \"foo\" baz) 64.333 12 foo");
+        let mut lexer = Lexer::new("(*bar+ \"foo\" baz) 64.333 12 foo");
         let mut token;
 
         if let Err(err) = lexer.scan() {
@@ -280,10 +280,18 @@ mod test {
         token = lexer.tokens.pop().unwrap();
         assert_eq!(
             token,
-            Token::new(String::from("bar"), TokenKind::Identifier)
+            Token::new(String::from("*bar+"), TokenKind::Identifier)
         );
 
         token = lexer.tokens.pop().unwrap();
         assert_eq!(token, Token::new(String::from("("), TokenKind::LeftParen));
     }
+}
+
+/// An S-expression (sexp for brevity).
+struct Sexp {}
+
+
+pub fn test_function() {
+    unimplemented!()
 }
