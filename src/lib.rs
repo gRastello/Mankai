@@ -1,10 +1,6 @@
 /// Types of tokens.
 #[derive(Debug, PartialEq)]
 enum TokenKind {
-    Plus,
-    Minus,
-    Star,
-    Slash,
     String(String),
     Number(f64),
     Identifier,
@@ -99,6 +95,11 @@ impl Lexer {
         }
     }
 
+    /// Return if the character is a separator (whitespace or parenthesis).
+    fn is_separator(c: char) -> bool {
+        c.is_whitespace() || c == '(' || c == ')'
+    }
+
     /// Add a new token to the internal store with the given kind.
     fn add_token(&mut self, kind: TokenKind) {
         let lexeme: String = self
@@ -171,7 +172,7 @@ impl Lexer {
 
     /// Tokenize an identifier.
     fn finish_identifier(&mut self) -> Result<(), ScanError> {
-        while !self.peek().is_whitespace() && !self.is_at_end() {
+        while !Lexer::is_separator(self.peek()) && !self.is_at_end() {
             self.current += 1;
         }
 
@@ -187,10 +188,6 @@ impl Lexer {
 
         match c {
             ' ' | '\t' | '\n' | '\r' => Ok(()),
-            '+' => Ok(self.add_token(TokenKind::Plus)),
-            '-' => Ok(self.add_token(TokenKind::Minus)),
-            '*' => Ok(self.add_token(TokenKind::Star)),
-            '/' => Ok(self.add_token(TokenKind::Slash)),
             '(' => Ok(self.add_token(TokenKind::LeftParen)),
             ')' => Ok(self.add_token(TokenKind::RightParen)),
             '"' => self.finish_string(),
@@ -233,7 +230,7 @@ mod test {
 
     #[test]
     fn lexing() {
-        let mut lexer = Lexer::new("(+-) */   \n  \"foo\" 64.333 12 foo");
+        let mut lexer = Lexer::new("(bar \"foo\" baz) 64.333 12 foo");
         let mut token;
 
         lexer.scan();
@@ -257,6 +254,15 @@ mod test {
         );
 
         token = lexer.tokens.pop().unwrap();
+        assert_eq!(token, Token::new(String::from(")"), TokenKind::RightParen));
+
+        token = lexer.tokens.pop().unwrap();
+        assert_eq!(
+            token,
+            Token::new(String::from("baz"), TokenKind::Identifier)
+        );
+
+        token = lexer.tokens.pop().unwrap();
         assert_eq!(
             token,
             Token::new(
@@ -266,19 +272,10 @@ mod test {
         );
 
         token = lexer.tokens.pop().unwrap();
-        assert_eq!(token, Token::new(String::from("/"), TokenKind::Slash));
-
-        token = lexer.tokens.pop().unwrap();
-        assert_eq!(token, Token::new(String::from("*"), TokenKind::Star));
-
-        token = lexer.tokens.pop().unwrap();
-        assert_eq!(token, Token::new(String::from(")"), TokenKind::RightParen));
-
-        token = lexer.tokens.pop().unwrap();
-        assert_eq!(token, Token::new(String::from("-"), TokenKind::Minus));
-
-        token = lexer.tokens.pop().unwrap();
-        assert_eq!(token, Token::new(String::from("+"), TokenKind::Plus));
+        assert_eq!(
+            token,
+            Token::new(String::from("bar"), TokenKind::Identifier)
+        );
 
         token = lexer.tokens.pop().unwrap();
         assert_eq!(token, Token::new(String::from("("), TokenKind::LeftParen));
