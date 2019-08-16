@@ -183,9 +183,7 @@ impl Lexer {
 
     /// Scan a new token.
     fn scan_token(&mut self) -> Result<(), ScanError> {
-        self.start = self.current;
         let c = self.advance();
-
         match c {
             ' ' | '\t' | '\n' | '\r' => Ok(()),
             '(' => Ok(self.add_token(TokenKind::LeftParen)),
@@ -204,9 +202,12 @@ impl Lexer {
     /// Scan the entire source code.
     fn scan(&mut self) -> Result<(), ScanError> {
         while !self.is_at_end() {
+            self.start = self.current;
             self.scan_token()?;
         }
 
+        self.start = self.current;
+        self.add_token(TokenKind::Eof);
         Ok(())
     }
 }
@@ -233,7 +234,12 @@ mod test {
         let mut lexer = Lexer::new("(bar \"foo\" baz) 64.333 12 foo");
         let mut token;
 
-        lexer.scan();
+        if let Err(err) = lexer.scan() {
+            panic!(err);
+        }
+
+        token = lexer.tokens.pop().unwrap();
+        assert_eq!(token, Token::new(String::from(""), TokenKind::Eof));
 
         token = lexer.tokens.pop().unwrap();
         assert_eq!(
