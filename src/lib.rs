@@ -289,8 +289,10 @@ mod test {
 }
 
 /// An S-expression (sexp for brevity).
-struct Sexp {}
-
+enum Sexp {
+    Atom(Token),
+    List(Vec<Sexp>),
+}
 
 pub fn test_function() {
     unimplemented!()
