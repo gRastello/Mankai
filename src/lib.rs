@@ -287,7 +287,3 @@ mod test {
         assert_eq!(token, Token::new(String::from("("), TokenKind::LeftParen));
     }
 }
-
-pub fn test_function() {
-    println!("foo bar");
-}
