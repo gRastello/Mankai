@@ -40,14 +40,17 @@ fn main() {
         // Process each expression.
         for expr in expressions {
             // Run the expression and get a result to send to the user.
-            let message = match run(expr, &mut interpreter) {
+            let result = match run(expr, &mut interpreter) {
                 Ok(object) => object.to_string(),
                 Err(error) => error.message,
             };
 
+            println!("{}", result);
+            let message = format!("`{}`", result);
+
             // Send the result to the user.
             let reply = context
-                .send_message_in_reply(&message)
+                .send_message_in_reply(tbot::types::parameters::Text::markdown(&message))
                 .into_future()
                 .map_err(|err| {
                     dbg!(err);
