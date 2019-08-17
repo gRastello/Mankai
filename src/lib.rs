@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 /// Types of tokens.
 #[derive(Debug, PartialEq, Clone)]
 enum TokenKind {
@@ -491,6 +493,101 @@ mod parser_test {
             ),
         }
         if let Ok(_) = parser.parse() {}
+    }
+}
+
+struct RuntimeError {
+    /// Error message.
+    message: String,
+}
+
+impl RuntimeError {
+    fn new(message: &str) -> Self {
+        RuntimeError {
+            message: String::from(message),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq)]
+enum MankaiObject {
+    Number(f64),
+    String(String),
+    // Function and NativeFunction
+}
+
+impl MankaiObject {
+    /// Create a new MankaiObject from a token.
+    fn from_token(token: &Token) -> Result<Self, RuntimeError> {
+        match &token.kind {
+            TokenKind::Number(n) => Ok(MankaiObject::Number(*n)),
+            TokenKind::String(s) => Ok(MankaiObject::String(s.to_string())),
+            _ => Err(RuntimeError::new("failed to convert atom to value")),
+        }
+    }
+}
+
+impl ToString for MankaiObject {
+    fn to_string(&self) -> String {
+        let mut string = String::new();
+        match self {
+            MankaiObject::Number(n) => n.to_string(),
+            MankaiObject::String(s) => s.to_string(),
+        }
+    }
+}
+
+struct Interpreter {}
+
+impl Interpreter {
+    fn eval(&mut self, expr: &Sexp) -> Result<MankaiObject, RuntimeError> {
+        match expr {
+            Sexp::Atom(token) => MankaiObject::from_token(token),
+            Sexp::List(_) => Err(RuntimeError::new(
+                "currently only atom evaluation is supported",
+            )),
+        }
+    }
+}
+
+mod interpreter_test {
+    use super::{Interpreter, Lexer, MankaiObject, Parser};
+
+    #[test]
+    fn atom_evaluating() {
+        // Number literal.
+        let mut lexer = Lexer::new("5");
+        if let Err(err) = lexer.scan() {
+            panic!(err);
+        }
+
+        let mut parser = Parser::new(lexer.tokens);
+        let mut interpreter = Interpreter {};
+
+        match parser.parse() {
+            Ok(expr) => match interpreter.eval(&expr) {
+                Ok(value) => assert_eq!(value, MankaiObject::Number(5.0)),
+                Err(err) => panic!(err),
+            },
+            Err(err) => panic!(err),
+        }
+
+        // String literal.
+        lexer = Lexer::new("\"foo\"");
+        if let Err(err) = lexer.scan() {
+            panic!(err);
+        }
+
+        parser = Parser::new(lexer.tokens);
+        interpreter = Interpreter {};
+
+        match parser.parse() {
+            Ok(expr) => match interpreter.eval(&expr) {
+                Ok(value) => assert_eq!(value, MankaiObject::String(String::from("foo"))),
+                Err(err) => panic!(err),
+            },
+            Err(err) => panic!(err),
+        }
     }
 }
 
