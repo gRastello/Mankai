@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 /// Types of tokens.
 #[derive(Debug, PartialEq, Clone)]
-enum TokenKind {
+pub enum TokenKind {
     String(String),
     Number(f64),
     Identifier,
@@ -13,9 +13,9 @@ enum TokenKind {
 
 /// A token.
 #[derive(Debug, PartialEq, Clone)]
-struct Token {
+pub struct Token {
     /// Corresponding lexeme.
-    lexeme: String,
+    pub lexeme: String,
     /// Kind of the token.
     kind: TokenKind,
 }
@@ -28,11 +28,11 @@ impl Token {
 }
 
 /// A lexing error.
-struct ScanError {
+pub struct ScanError {
     /// Error message.
-    message: String,
+    pub message: String,
     /// Start of the problematic token.
-    position: usize,
+    pub position: usize,
 }
 
 impl ScanError {
@@ -46,11 +46,11 @@ impl ScanError {
 }
 
 /// The lexer.
-struct Lexer {
+pub struct Lexer {
     /// The source code.
     source: String,
     /// The lexed tokens.
-    tokens: Vec<Token>,
+    pub tokens: Vec<Token>,
     /// Current token index.
     current: usize,
     /// Start of current lexeme.
@@ -59,9 +59,9 @@ struct Lexer {
 
 impl Lexer {
     /// Make a new lexer from some source code.
-    fn new(source: &str) -> Self {
+    pub fn new(source: String) -> Self {
         Lexer {
-            source: String::from(source),
+            source: source,
             tokens: Vec::new(),
             current: 0,
             start: 0,
@@ -202,7 +202,7 @@ impl Lexer {
     }
 
     /// Scan the entire source code.
-    fn scan(&mut self) -> Result<(), ScanError> {
+    pub fn scan(&mut self) -> Result<(), ScanError> {
         while !self.is_at_end() {
             self.start = self.current;
             self.scan_token()?;
@@ -210,6 +210,7 @@ impl Lexer {
 
         self.start = self.current;
         self.add_token(TokenKind::Eof);
+
         Ok(())
     }
 }
@@ -219,7 +220,7 @@ mod lexer_test {
 
     #[test]
     fn lexer_initialization_and_basic_operations() {
-        let mut lexer = Lexer::new("(foo)");
+        let mut lexer = Lexer::new(String::from("(foo)"));
 
         assert_eq!(lexer.advance(), '(');
         assert_eq!(lexer.advance(), 'f');
@@ -233,7 +234,7 @@ mod lexer_test {
 
     #[test]
     fn lexing() {
-        let mut lexer = Lexer::new("(*bar+ \"foo\" baz) 64.333 12 foo");
+        let mut lexer = Lexer::new(String::from("(*bar+ \"foo\" baz) 64.333 12 foo"));
         let mut token;
 
         if let Err(err) = lexer.scan() {
@@ -292,18 +293,18 @@ mod lexer_test {
 
 /// An S-expression (sexp for brevity).
 #[derive(Debug, PartialEq)]
-enum Sexp {
+pub enum Sexp {
     Atom(Token),
     List(Vec<Sexp>),
 }
 
 /// A parsing error.
 #[derive(Debug, PartialEq)]
-struct ParseError {
+pub struct ParseError {
     /// Error message.
-    message: String,
+    pub message: String,
     /// Problematic token,
-    token: Option<Token>,
+    pub token: Option<Token>,
 }
 
 impl ParseError {
@@ -325,7 +326,7 @@ impl ParseError {
 }
 
 /// The parser.
-struct Parser {
+pub struct Parser {
     /// Token stream to parse.
     tokens: Vec<Token>,
     /// Current token.
@@ -334,7 +335,7 @@ struct Parser {
 
 impl Parser {
     /// Make a new parser from a token stream.
-    fn new(tokens: Vec<Token>) -> Self {
+    pub fn new(tokens: Vec<Token>) -> Self {
         Parser { tokens, current: 0 }
     }
 
@@ -382,7 +383,7 @@ impl Parser {
         }
     }
 
-    fn parse(&mut self) -> Result<Sexp, ParseError> {
+    pub fn parse(&mut self) -> Result<Sexp, ParseError> {
         if !self.is_at_end() {
             self.parse_sexp()
         } else {
@@ -396,7 +397,7 @@ mod parser_test {
 
     #[test]
     fn parser_initialization_and_basic_operations() {
-        let mut lexer = Lexer::new("(foo)");
+        let mut lexer = Lexer::new(String::from("(foo)"));
         if let Err(err) = lexer.scan() {
             panic!(err);
         }
@@ -419,7 +420,7 @@ mod parser_test {
 
     #[test]
     fn parsing() {
-        let mut lexer = Lexer::new("(car (\"2\" 3) \"foo\" 12.0)");
+        let mut lexer = Lexer::new(String::from("(car (\"2\" 3) \"foo\" 12.0)"));
         if let Err(err) = lexer.scan() {
             panic!(err);
         }
@@ -476,7 +477,7 @@ mod parser_test {
 
     #[test]
     fn unbalanced_expression() {
-        let mut lexer = Lexer::new("(foo bar 32.66");
+        let mut lexer = Lexer::new(String::from("(foo bar 32.66"));
         if let Err(err) = lexer.scan() {
             panic!(err);
         }
@@ -496,9 +497,9 @@ mod parser_test {
     }
 }
 
-struct RuntimeError {
+pub struct RuntimeError {
     /// Error message.
-    message: String,
+    pub message: String,
 }
 
 impl RuntimeError {
@@ -510,7 +511,7 @@ impl RuntimeError {
 }
 
 #[derive(Debug, PartialEq)]
-enum MankaiObject {
+pub enum MankaiObject {
     Number(f64),
     String(String),
     // Function and NativeFunction
@@ -529,7 +530,6 @@ impl MankaiObject {
 
 impl ToString for MankaiObject {
     fn to_string(&self) -> String {
-        let mut string = String::new();
         match self {
             MankaiObject::Number(n) => n.to_string(),
             MankaiObject::String(s) => s.to_string(),
@@ -537,10 +537,10 @@ impl ToString for MankaiObject {
     }
 }
 
-struct Interpreter {}
+pub struct Interpreter {}
 
 impl Interpreter {
-    fn eval(&mut self, expr: &Sexp) -> Result<MankaiObject, RuntimeError> {
+    pub fn eval(&mut self, expr: &Sexp) -> Result<MankaiObject, RuntimeError> {
         match expr {
             Sexp::Atom(token) => MankaiObject::from_token(token),
             Sexp::List(_) => Err(RuntimeError::new(
@@ -556,7 +556,7 @@ mod interpreter_test {
     #[test]
     fn atom_evaluating() {
         // Number literal.
-        let mut lexer = Lexer::new("5");
+        let mut lexer = Lexer::new(String::from("5"));
         if let Err(err) = lexer.scan() {
             panic!(err);
         }
@@ -573,7 +573,7 @@ mod interpreter_test {
         }
 
         // String literal.
-        lexer = Lexer::new("\"foo\"");
+        lexer = Lexer::new(String::from("\"foo\""));
         if let Err(err) = lexer.scan() {
             panic!(err);
         }
@@ -592,7 +592,7 @@ mod interpreter_test {
 }
 
 pub fn test_function() {
-    let mut lexer = Lexer::new("(car (\"2\" 3) \"foo\" 12.0)");
+    let mut lexer = Lexer::new(String::from("(car (\"2\" 3) \"foo\" 12.0)"));
     if let Err(err) = lexer.scan() {
         panic!(err);
     }
