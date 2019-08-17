@@ -600,16 +600,3 @@ mod interpreter_test {
         }
     }
 }
-
-pub fn test_function() {
-    let mut lexer = Lexer::new(String::from("(car (\"2\" 3) \"foo\" 12.0)"));
-    if let Err(err) = lexer.scan() {
-        panic!(err);
-    }
-
-    let mut parser = Parser::new(lexer.tokens);
-    match parser.parse() {
-        Ok(sexp) => println!("{:?}", sexp),
-        Err(err) => panic!(err),
-    }
-}
