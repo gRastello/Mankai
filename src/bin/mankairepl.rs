@@ -11,7 +11,7 @@ pub struct MankaiError {
 impl From<ScanError> for MankaiError {
     fn from(err: ScanError) -> Self {
         let mut message = String::new();
-        message.push_str("lexing error at ");
+        message.push_str("Lexing error at ");
         message.push_str(&err.position.to_string());
         message.push_str(": ");
         message.push_str(&err.message);
@@ -23,7 +23,7 @@ impl From<ScanError> for MankaiError {
 impl From<ParseError> for MankaiError {
     fn from(err: ParseError) -> Self {
         let mut message = String::new();
-        message.push_str("parsing error");
+        message.push_str("Parsing error");
         if let Some(token) = err.token {
             message.push_str(" at '");
             message.push_str(&token.lexeme);
@@ -38,9 +38,11 @@ impl From<ParseError> for MankaiError {
 
 impl From<RuntimeError> for MankaiError {
     fn from(err: RuntimeError) -> Self {
-        MankaiError {
-            message: err.message,
-        }
+        let mut message = String::new();
+        message.push_str("Runtime error: ");
+        message.push_str(&err.message);
+
+        MankaiError { message }
     }
 }
 

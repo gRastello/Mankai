@@ -544,7 +544,7 @@ impl Interpreter {
         match expr {
             Sexp::Atom(token) => MankaiObject::from_token(token),
             Sexp::List(_) => Err(RuntimeError::new(
-                "currently only atom evaluation is supported",
+                "I can't evaluate function calls (yet)",
             )),
         }
     }
