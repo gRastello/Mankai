@@ -36,15 +36,15 @@ fn main() {
         }
 
         // Process each expression.
-        for expr in expressions {
+        for (i, expr) in expressions.iter().enumerate() {
             // Run the expression and get a result to send to the user.
-            let result = match run(expr, &mut interpreter) {
+            let result = match run(expr.into(), &mut interpreter) {
                 Ok(object) => object.to_string(),
                 Err(error) => error.message,
             };
 
-            println!("{}", result);
-            let message = format!("`{}`", result);
+            println!("[{}] {}", i, result);
+            let message = format!("[[{}]] `{}`", i, result);
 
             // Send the result to the user.
             let reply = context
