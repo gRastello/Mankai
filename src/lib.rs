@@ -237,7 +237,7 @@ mod lexer_test {
 
     #[test]
     fn lexing() {
-        let mut lexer = Lexer::new(String::from("(*bar+ \"foo\" baz) 64.333 12 foo"));
+        let mut lexer = Lexer::new(String::from("(*bar+ \"foo\" baz) 64.333 12 foo 12,2"));
         let mut token;
 
         if let Err(err) = lexer.scan() {
@@ -246,6 +246,15 @@ mod lexer_test {
 
         token = lexer.tokens.pop().unwrap();
         assert_eq!(token, Token::new(String::from(""), TokenKind::Eof));
+
+        token = lexer.tokens.pop().unwrap();
+        assert_eq!(token, Token::new(String::from(",2"), TokenKind::Identifier));
+
+        token = lexer.tokens.pop().unwrap();
+        assert_eq!(
+            token,
+            Token::new(String::from("12"), TokenKind::Number(12.0))
+        );
 
         token = lexer.tokens.pop().unwrap();
         assert_eq!(
@@ -546,9 +555,7 @@ impl Interpreter {
     pub fn eval(&mut self, expr: &Sexp) -> Result<MankaiObject, RuntimeError> {
         match expr {
             Sexp::Atom(token) => MankaiObject::from_token(token),
-            Sexp::List(_) => Err(RuntimeError::new(
-                "I can't evaluate function calls (yet)",
-            )),
+            Sexp::List(_) => Err(RuntimeError::new("I can't evaluate function calls (yet)")),
         }
     }
 }
