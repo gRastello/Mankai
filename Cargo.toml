@@ -7,7 +7,3 @@ edition = "2018"
 [lib]
 name = "mankailib"
 path = "src/lib.rs"
-
-[[bin]]
-name = "mankairepl"
-path = "src/bin.rs"
