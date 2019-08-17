@@ -296,6 +296,7 @@ enum Sexp {
 }
 
 /// A parsing error.
+#[derive(Debug, PartialEq)]
 struct ParseError {
     /// Error message.
     message: String,
@@ -389,7 +390,7 @@ impl Parser {
 }
 
 mod parser_test {
-    use super::{Lexer, Parser, Sexp, Token, TokenKind};
+    use super::{Lexer, ParseError, Parser, Sexp, Token, TokenKind};
 
     #[test]
     fn parser_initialization_and_basic_operations() {
@@ -469,6 +470,27 @@ mod parser_test {
             },
             Err(err) => panic!(err),
         }
+    }
+
+    #[test]
+    fn unbalanced_expression() {
+        let mut lexer = Lexer::new("(foo bar 32.66");
+        if let Err(err) = lexer.scan() {
+            panic!(err);
+        }
+
+        let mut parser = Parser::new(lexer.tokens);
+        match parser.parse() {
+            Ok(_) => panic!("expected to fail parsing!"),
+            Err(err) => assert_eq!(
+                err,
+                ParseError::new(
+                    "expected ')'",
+                    &Token::new(String::from(""), TokenKind::Eof)
+                )
+            ),
+        }
+        if let Ok(_) = parser.parse() {}
     }
 }
 
