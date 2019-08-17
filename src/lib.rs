@@ -1,5 +1,8 @@
 use std::collections::HashMap;
 
+mod error;
+pub use error::MankaiError;
+
 /// Types of tokens.
 #[derive(Debug, PartialEq, Clone)]
 pub enum TokenKind {

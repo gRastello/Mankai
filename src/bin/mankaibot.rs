@@ -2,9 +2,7 @@ use std::{env, process};
 
 use tbot::prelude::*;
 
-mod mankairepl;
-use mankailib::{Interpreter, Lexer, MankaiObject, Parser};
-use mankairepl::MankaiError;
+use mankailib::{Interpreter, Lexer, MankaiError, MankaiObject, Parser};
 
 fn main() {
     // Create a new bot from a token given as command line argument.
