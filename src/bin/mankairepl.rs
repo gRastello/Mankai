@@ -2,9 +2,10 @@ use mankailib::{Interpreter, Lexer, ParseError, Parser, RuntimeError, ScanError}
 use std::io;
 use std::io::prelude::*;
 
-struct MankaiError {
+/// A general Mankai error (can be a parsing error or a runtime error).
+pub struct MankaiError {
     /// Error message.
-    message: String,
+    pub message: String,
 }
 
 impl From<ScanError> for MankaiError {

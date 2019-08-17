@@ -4,6 +4,9 @@ version = "0.1.0"
 authors = ["grastello <gabriele.rastello@edu.unito.it>"]
 edition = "2018"
 
+[dependencies]
+tbot = "0.1.2"
+
 [lib]
 name = "mankailib"
 path = "src/lib.rs"
