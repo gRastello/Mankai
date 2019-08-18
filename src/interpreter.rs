@@ -31,8 +31,12 @@ impl ToString for MankaiObject {
     }
 }
 
+/// A Mankai interepreter.
 pub struct Interpreter {
+    /// The environment.
     environment: Environment,
+    /// Array of reserved names for special forms.
+    special_forms: Vec<String>,
 }
 
 impl Interpreter {
@@ -40,7 +44,13 @@ impl Interpreter {
     pub fn new() -> Self {
         Interpreter {
             environment: Environment::new(),
+            special_forms: vec![String::from("set!")],
         }
+    }
+
+    /// Check if the identifier is usable i.e. the name is not reserved for special forms or natives.
+    fn is_usable(&self, identifier: &Token) -> bool {
+        !self.special_forms.iter().any(|s| *s == identifier.lexeme)
     }
 
     /// Evaluate an atom.
@@ -48,7 +58,16 @@ impl Interpreter {
         match &atom.kind {
             TokenKind::Number(n) => Ok(MankaiObject::Number(*n)),
             TokenKind::String(s) => Ok(MankaiObject::String(s.to_string())),
-            TokenKind::Identifier => self.environment.get(atom),
+            TokenKind::Identifier => {
+                if self.is_usable(atom) {
+                    self.environment.get(atom)
+                } else {
+                    Err(RuntimeError::new(&format!(
+                        "'{}' is the name of a  special form!",
+                        atom.lexeme
+                    )))
+                }
+            }
             _ => Err(RuntimeError::new("failed to convert atom to value")),
         }
     }
@@ -141,6 +160,24 @@ mod interpreter_test {
                 Ok(value) => assert_eq!(value, MankaiObject::Number(2.0)),
                 Err(err) => panic!(err.message),
             },
+            Err(err) => panic!(err.message),
+        }
+
+        // Special form
+        lexer = Lexer::new(String::from("set!"));
+        if let Err(err) = lexer.scan() {
+            panic!(err.message);
+        }
+
+        parser = Parser::new(lexer.tokens);
+        interpreter = Interpreter::new();
+
+        match parser.parse() {
+            Ok(expr) => {
+                if let Ok(_) = interpreter.evaluate(&expr) {
+                    panic!("expected runtime error");
+                }
+            }
             Err(err) => panic!(err.message),
         }
     }
