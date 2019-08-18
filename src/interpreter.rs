@@ -22,17 +22,6 @@ pub enum MankaiObject {
     // Function and NativeFunction
 }
 
-impl MankaiObject {
-    /// Create a new MankaiObject from a token.
-    fn from_token(token: &Token) -> Result<Self, RuntimeError> {
-        match &token.kind {
-            TokenKind::Number(n) => Ok(MankaiObject::Number(*n)),
-            TokenKind::String(s) => Ok(MankaiObject::String(s.to_string())),
-            _ => Err(RuntimeError::new("failed to convert atom to value")),
-        }
-    }
-}
-
 impl ToString for MankaiObject {
     fn to_string(&self) -> String {
         match self {
@@ -54,10 +43,20 @@ impl Interpreter {
         }
     }
 
+    /// Evaluate an atom.
+    pub fn evaluate_atom(&self, atom: &Token) -> Result<MankaiObject, RuntimeError> {
+        match &atom.kind {
+            TokenKind::Number(n) => Ok(MankaiObject::Number(*n)),
+            TokenKind::String(s) => Ok(MankaiObject::String(s.to_string())),
+            TokenKind::Identifier => self.environment.get(atom),
+            _ => Err(RuntimeError::new("failed to convert atom to value")),
+        }
+    }
+
     /// Evaluate an expression.
     pub fn evaluate(&mut self, expr: &Sexp) -> Result<MankaiObject, RuntimeError> {
         match expr {
-            Sexp::Atom(token) => MankaiObject::from_token(token),
+            Sexp::Atom(token) => self.evaluate_atom(token), // MankaiObject::from_token(token),
             Sexp::List(_) => Err(RuntimeError::new("I can't evaluate function calls (yet)")),
         }
     }
@@ -67,41 +66,82 @@ mod interpreter_test {
     use super::{Interpreter, MankaiObject};
     use crate::lexer::Lexer;
     use crate::parser::Parser;
+    use crate::token::*;
 
     #[test]
     fn atom_evaluating() {
         // Number literal.
         let mut lexer = Lexer::new(String::from("5"));
         if let Err(err) = lexer.scan() {
-            panic!(err);
+            panic!(err.message);
         }
 
         let mut parser = Parser::new(lexer.tokens);
-        let mut interpreter = Interpreter {};
+        let mut interpreter = Interpreter::new();
 
         match parser.parse() {
-            Ok(expr) => match interpreter.eval(&expr) {
+            Ok(expr) => match interpreter.evaluate(&expr) {
                 Ok(value) => assert_eq!(value, MankaiObject::Number(5.0)),
-                Err(err) => panic!(err),
+                Err(err) => panic!(err.message),
             },
-            Err(err) => panic!(err),
+            Err(err) => panic!(err.message),
         }
 
         // String literal.
         lexer = Lexer::new(String::from("\"foo\""));
         if let Err(err) = lexer.scan() {
-            panic!(err);
+            panic!(err.message);
         }
 
         parser = Parser::new(lexer.tokens);
-        interpreter = Interpreter {};
+        interpreter = Interpreter::new();
 
         match parser.parse() {
-            Ok(expr) => match interpreter.eval(&expr) {
+            Ok(expr) => match interpreter.evaluate(&expr) {
                 Ok(value) => assert_eq!(value, MankaiObject::String(String::from("foo"))),
-                Err(err) => panic!(err),
+                Err(err) => panic!(err.message),
             },
-            Err(err) => panic!(err),
+            Err(err) => panic!(err.message),
+        }
+
+        // Symbol non-binded.
+        lexer = Lexer::new(String::from("foo"));
+        if let Err(err) = lexer.scan() {
+            panic!(err.message);
+        }
+
+        parser = Parser::new(lexer.tokens);
+        interpreter = Interpreter::new();
+
+        match parser.parse() {
+            Ok(expr) => {
+                if let Ok(_) = interpreter.evaluate(&expr) {
+                    panic!("found nonexistent bidning");
+                }
+            }
+            Err(err) => panic!(err.message),
+        }
+
+        // Symbol binded.
+        lexer = Lexer::new(String::from("bar"));
+        if let Err(err) = lexer.scan() {
+            panic!(err.message);
+        }
+
+        parser = Parser::new(lexer.tokens);
+        interpreter = Interpreter::new();
+
+        interpreter.environment.define(
+            &Token::new(String::from("bar"), TokenKind::Identifier),
+            MankaiObject::Number(2.0),
+        );
+
+        match parser.parse() {
+            Ok(expr) => match interpreter.evaluate(&expr) {
+                Ok(value) => assert_eq!(value, MankaiObject::Number(2.0)),
+                Err(err) => panic!(err.message),
+            },
+            Err(err) => panic!(err.message),
         }
     }
 }
