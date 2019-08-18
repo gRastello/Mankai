@@ -22,7 +22,7 @@ fn run(source: String, interpreter: &mut Interpreter) -> Result<(), MankaiError>
     let mut parser = Parser::new(lexer.tokens);
     let sexp = parser.parse()?;
 
-    let value = interpreter.eval(&sexp)?;
+    let value = interpreter.evaluate(&sexp)?;
     println!("{}", value.to_string());
 
     Ok(())

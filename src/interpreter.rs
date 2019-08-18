@@ -44,7 +44,7 @@ impl ToString for MankaiObject {
 pub struct Interpreter {}
 
 impl Interpreter {
-    pub fn eval(&mut self, expr: &Sexp) -> Result<MankaiObject, RuntimeError> {
+    pub fn evaluate(&mut self, expr: &Sexp) -> Result<MankaiObject, RuntimeError> {
         match expr {
             Sexp::Atom(token) => MankaiObject::from_token(token),
             Sexp::List(_) => Err(RuntimeError::new("I can't evaluate function calls (yet)")),

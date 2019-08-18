@@ -69,6 +69,6 @@ fn run(source: String, interpreter: &mut Interpreter) -> Result<MankaiObject, Ma
     let mut parser = Parser::new(lexer.tokens);
     let sexp = parser.parse()?;
 
-    let value = interpreter.eval(&sexp)?;
+    let value = interpreter.evaluate(&sexp)?;
     Ok(value)
 }
