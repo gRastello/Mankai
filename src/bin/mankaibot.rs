@@ -16,7 +16,7 @@ fn main() {
     let mut bot = tbot::Bot::new(tbot::Token::new(bot_token)).event_loop();
 
     // The interpreter for this sessions.
-    let mut interpreter = Interpreter {};
+    let mut interpreter = Interpreter::new();
 
     // Handle for messages.
     bot.text(move |context| {

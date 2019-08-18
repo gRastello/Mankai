@@ -1,3 +1,4 @@
+use crate::environment::Environment;
 use crate::parser::Sexp;
 use crate::token::*;
 
@@ -41,9 +42,19 @@ impl ToString for MankaiObject {
     }
 }
 
-pub struct Interpreter {}
+pub struct Interpreter {
+    environment: Environment,
+}
 
 impl Interpreter {
+    /// Create a new interpreter.
+    pub fn new() -> Self {
+        Interpreter {
+            environment: Environment::new(),
+        }
+    }
+
+    /// Evaluate an expression.
     pub fn evaluate(&mut self, expr: &Sexp) -> Result<MankaiObject, RuntimeError> {
         match expr {
             Sexp::Atom(token) => MankaiObject::from_token(token),

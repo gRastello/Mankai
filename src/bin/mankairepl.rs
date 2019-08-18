@@ -4,7 +4,7 @@ use std::io::prelude::*;
 
 fn main() {
     let stdin = io::stdin();
-    let mut interpreter = Interpreter {};
+    let mut interpreter = Interpreter::new();
 
     for line in stdin.lock().lines() {
         if let Ok(source) = line {
