@@ -1,4 +1,4 @@
-use mankailib::{MankaiError, Interpreter, Lexer, Parser};
+use mankailib::{Interpreter, Lexer, MankaiError, Parser};
 use std::io;
 use std::io::prelude::*;
 
