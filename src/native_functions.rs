@@ -126,3 +126,29 @@ pub fn division(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeErr
 
     Ok(MankaiObject::Number(result))
 }
+
+/// Concatenate strings.
+pub fn string_concat(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
+    // Check arity.
+    if arguments.is_empty() {
+        return Err(RuntimeError::new(
+            "'string-concat' requires at least one argument!",
+        ));
+    }
+
+    // Perform concatenation.
+    let mut result = String::new();
+    for (i, value) in arguments.iter().enumerate() {
+        match value {
+            MankaiObject::String(s) => result.push_str(s),
+            _ => {
+                return Err(RuntimeError::new(&format!(
+                    "{}-th argument must be a string!",
+                    i + 1
+                )))
+            }
+        }
+    }
+
+    Ok(MankaiObject::String(result))
+}
