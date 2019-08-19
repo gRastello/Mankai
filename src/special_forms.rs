@@ -1,5 +1,6 @@
 use crate::interpreter::*;
 use crate::parser::Sexp;
+use crate::token::TokenKind;
 
 /// The `set!` special form.
 pub fn set(
@@ -12,7 +13,8 @@ pub fn set(
     }
 
     // Get token that identifies the name of the variable. Return an error if
-    // trying to set! a special form of a native function.
+    // trying to set! a special form of a native function or if the token is not
+    // an identifier.
     let name = match arguments.get(0).unwrap() {
         Sexp::Atom(token) => token,
         Sexp::List(_) => {
@@ -21,6 +23,15 @@ pub fn set(
             ))
         }
     };
+
+    if let TokenKind::Identifier = name.kind {
+
+    } else {
+        return Err(RuntimeError::new(&format!(
+            "'{}' is not an identifier!",
+            name.lexeme
+        )));
+    }
 
     if interpreter.is_special_form(name) {
         return Err(RuntimeError::new(&format!(
