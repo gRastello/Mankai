@@ -26,6 +26,12 @@ impl Environment {
         let sum = MankaiObject::Native(native_functions::sum);
         environment.define(&Token::new(String::from("+"), TokenKind::Identifier), sum);
 
+        let substraction = MankaiObject::Native(native_functions::substract);
+        environment.define(
+            &Token::new(String::from("-"), TokenKind::Identifier),
+            substraction,
+        );
+
         environment
     }
 
