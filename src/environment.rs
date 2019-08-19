@@ -38,6 +38,12 @@ impl Environment {
             multiplication,
         );
 
+        let division = MankaiObject::Native(native_functions::division);
+        environment.define(
+            &Token::new(String::from("/"), TokenKind::Identifier),
+            division,
+        );
+
         environment
     }
 
