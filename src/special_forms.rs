@@ -21,6 +21,12 @@ pub fn set(
         }
     };
 
+    if interpreter.is_special_form(name) {
+        return Err(RuntimeError::new(
+            "can't assign to 'set!' because the name is reserved for a special form",
+        ));
+    }
+
     // Get the value to assign.
     let value = interpreter.evaluate(arguments.get(1).unwrap())?;
     let value_clone = value.clone();

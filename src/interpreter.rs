@@ -78,7 +78,7 @@ impl Interpreter {
     }
 
     /// Check if the identifier is reserved for a special form.
-    fn is_special_form(&self, identifier: &Token) -> bool {
+    pub fn is_special_form(&self, identifier: &Token) -> bool {
         self.special_forms.iter().any(|s| *s == identifier.lexeme)
     }
 
