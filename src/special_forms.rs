@@ -35,14 +35,14 @@ pub fn set(
 
     if interpreter.is_special_form(name) {
         return Err(RuntimeError::new(&format!(
-            "can't assign to '{}' because the name is reserved for a special form",
+            "can't assign to '{}' because the name is reserved for a special form!",
             name.lexeme
         )));
     }
 
     if interpreter.is_native_fucntion(name) {
         return Err(RuntimeError::new(&format!(
-            "can't assign to '{}' because the name is reserved for a native function",
+            "can't assign to '{}' because the name is reserved for a native function!",
             name.lexeme
         )));
     }

@@ -94,7 +94,7 @@ impl Default for Interpreter {
         Interpreter {
             environment: Environment::new(),
             special_forms: vec![String::from("set!")],
-            native_functions: vec![String::from("+"), String::from("-")],
+            native_functions: vec![String::from("+"), String::from("-"), String::from("*")],
         }
     }
 }

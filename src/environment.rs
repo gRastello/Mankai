@@ -32,6 +32,12 @@ impl Environment {
             substraction,
         );
 
+        let multiplication = MankaiObject::Native(native_functions::multiplication);
+        environment.define(
+            &Token::new(String::from("*"), TokenKind::Identifier),
+            multiplication,
+        );
+
         environment
     }
 

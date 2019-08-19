@@ -39,14 +39,14 @@ pub fn substract(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeEr
     if arguments.len() == 1 {
         return match arguments.get(0).unwrap() {
             MankaiObject::Number(n) => Ok(MankaiObject::Number(-n)),
-            _ => Err(RuntimeError::new("1st arguments of '-' is not a number!")),
+            _ => Err(RuntimeError::new("1st arguments to '-' is not a number!")),
         };
     }
 
     // If there are more arguments perform the right number of substractions.
     let mut result = match arguments.get(0).unwrap() {
         MankaiObject::Number(n) => n.clone(),
-        _ => return Err(RuntimeError::new("1st arguments of '-' is not a number!")),
+        _ => return Err(RuntimeError::new("1st arguments to '-' is not a number!")),
     };
 
     for (i, value) in arguments.iter().enumerate().skip(1) {
@@ -54,7 +54,32 @@ pub fn substract(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeEr
             MankaiObject::Number(n) => result -= n,
             _ => {
                 return Err(RuntimeError::new(&format!(
-                    "{}-th argument of '-' is not a number!",
+                    "{}-th argument to '-' is not a number!",
+                    i + 1
+                )))
+            }
+        }
+    }
+
+    Ok(MankaiObject::Number(result))
+}
+
+/// Multiply all the arguments. Return an error if a non numeric argument is
+/// found or no arguments are found at all.
+pub fn multiplication(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
+    // Check arity.
+    if arguments.is_empty() {
+        return Err(RuntimeError::new("'*' requires at least one argument!"));
+    }
+
+    // Perform the multiplication of all arguments.
+    let mut result = 1.0;
+    for (i, value) in arguments.iter().enumerate() {
+        match value {
+            MankaiObject::Number(n) => result *= n,
+            _ => {
+                return Err(RuntimeError::new(&format!(
+                    "{}-th argument to '*' is not a number!",
                     i + 1
                 )))
             }
