@@ -58,6 +58,7 @@ fn main() {
     });
 
     // Run the bot.
+    println!("Mankaibot running!");
     bot.polling().start();
 }
 
