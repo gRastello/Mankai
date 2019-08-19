@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 
-use crate::interpreter::{MankaiObject, RuntimeError};
-use crate::token::Token;
+use crate::interpreter::{Interpreter, MankaiObject, RuntimeError};
+use crate::parser::Sexp;
+use crate::special_forms;
+use crate::token::*;
 
 pub struct Environment {
     bindings: HashMap<String, MankaiObject>,
@@ -10,9 +12,18 @@ pub struct Environment {
 impl Environment {
     /// Make a new environment.
     pub fn new() -> Self {
-        Environment {
+        let mut environment = Environment {
             bindings: HashMap::new(),
-        }
+        };
+
+        // Bring to scope some special forms.
+        let set = MankaiObject::SpecialForm(special_forms::set);
+        environment.define(
+            &Token::new(String::from("set!"), TokenKind::Identifier),
+            set,
+        );
+
+        environment
     }
 
     /// Define a new binding.

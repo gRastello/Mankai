@@ -2,6 +2,7 @@ use crate::environment::Environment;
 use crate::parser::Sexp;
 use crate::token::*;
 
+/// A runtime error.
 pub struct RuntimeError {
     /// Error message.
     pub message: String,
@@ -15,11 +16,38 @@ impl RuntimeError {
     }
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Clone)]
 pub enum MankaiObject {
     Number(f64),
     String(String),
+    SpecialForm(fn(&mut Interpreter, Vec<&Sexp>) -> Result<MankaiObject, RuntimeError>),
     // Function and NativeFunction
+}
+
+impl std::fmt::Debug for MankaiObject {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            MankaiObject::Number(n) => write!(f, "{}", n),
+            MankaiObject::String(s) => write!(f, "{}", s),
+            MankaiObject::SpecialForm(_) => write!(f, "special form"),
+        }
+    }
+}
+
+impl PartialEq for MankaiObject {
+    fn eq(&self, other: &Self) -> bool {
+        match self {
+            MankaiObject::Number(n) => match other {
+                MankaiObject::Number(m) => n == m,
+                _ => false,
+            },
+            MankaiObject::String(s) => match other {
+                MankaiObject::String(t) => s == t,
+                _ => false,
+            },
+            MankaiObject::SpecialForm(_) => false,
+        }
+    }
 }
 
 impl ToString for MankaiObject {
@@ -27,6 +55,7 @@ impl ToString for MankaiObject {
         match self {
             MankaiObject::Number(n) => n.to_string(),
             MankaiObject::String(s) => s.to_string(),
+            MankaiObject::SpecialForm(_) => String::from("<special form>"),
         }
     }
 }
@@ -34,7 +63,7 @@ impl ToString for MankaiObject {
 /// A Mankai interepreter.
 pub struct Interpreter {
     /// The environment.
-    environment: Environment,
+    pub environment: Environment,
     /// Array of reserved names for special forms.
     special_forms: Vec<String>,
 }
@@ -48,35 +77,38 @@ impl Interpreter {
         }
     }
 
-    /// Check if the identifier is usable i.e. the name is not reserved for special forms or natives.
-    fn is_usable(&self, identifier: &Token) -> bool {
-        !self.special_forms.iter().any(|s| *s == identifier.lexeme)
+    /// Check if the identifier is reserved for a special form.
+    fn is_special_form(&self, identifier: &Token) -> bool {
+        self.special_forms.iter().any(|s| *s == identifier.lexeme)
     }
 
     /// Evaluate an atom.
-    pub fn evaluate_atom(&self, atom: &Token) -> Result<MankaiObject, RuntimeError> {
+    fn evaluate_atom(&self, atom: &Token) -> Result<MankaiObject, RuntimeError> {
         match &atom.kind {
             TokenKind::Number(n) => Ok(MankaiObject::Number(*n)),
             TokenKind::String(s) => Ok(MankaiObject::String(s.to_string())),
-            TokenKind::Identifier => {
-                if self.is_usable(atom) {
-                    self.environment.get(atom)
-                } else {
-                    Err(RuntimeError::new(&format!(
-                        "'{}' is the name of a  special form!",
-                        atom.lexeme
-                    )))
-                }
-            }
+            TokenKind::Identifier => self.environment.get(atom),
             _ => Err(RuntimeError::new("failed to convert atom to value")),
+        }
+    }
+
+    /// Evaluate a list: can result in evaluating a special form or a function
+    /// (user-defined or native).
+    fn evaluate_list(&mut self, list: &Vec<Sexp>) -> Result<MankaiObject, RuntimeError> {
+        let callee = self.evaluate(list.get(0).unwrap())?;
+        let arguments: Vec<&Sexp> = list.iter().skip(1).collect();
+
+        match callee {
+            MankaiObject::SpecialForm(special_form) => special_form(self, arguments),
+            _ => Err(RuntimeError::new("I can't call functions yet!")),
         }
     }
 
     /// Evaluate an expression.
     pub fn evaluate(&mut self, expr: &Sexp) -> Result<MankaiObject, RuntimeError> {
         match expr {
-            Sexp::Atom(token) => self.evaluate_atom(token), // MankaiObject::from_token(token),
-            Sexp::List(_) => Err(RuntimeError::new("I can't evaluate function calls (yet)")),
+            Sexp::Atom(token) => self.evaluate_atom(token),
+            Sexp::List(list) => self.evaluate_list(list),
         }
     }
 }
