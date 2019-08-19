@@ -201,21 +201,37 @@ mod interpreter_test {
             },
             Err(err) => panic!(err.message),
         }
+    }
 
-        // Special form
-        lexer = Lexer::new(String::from("set!"));
+    #[test]
+    fn set_special_form() {
+        let mut lexer = Lexer::new(String::from("(set! foo \"bar\")"));
+        if let Err(err) = lexer.scan() {
+            panic!(err.message);
+        }
+
+        let mut parser = Parser::new(lexer.tokens);
+        let mut interpreter = Interpreter::new();
+
+        match parser.parse() {
+            Ok(expr) => match interpreter.evaluate(&expr) {
+                Ok(value) => assert_eq!(value, MankaiObject::String(String::from("bar"))),
+                Err(err) => panic!(err.message),
+            }
+            Err(err) => panic!(err.message),
+        }
+
+        lexer = Lexer::new(String::from("foo"));
         if let Err(err) = lexer.scan() {
             panic!(err.message);
         }
 
         parser = Parser::new(lexer.tokens);
-        interpreter = Interpreter::new();
-
+        
         match parser.parse() {
-            Ok(expr) => {
-                if let Ok(_) = interpreter.evaluate(&expr) {
-                    panic!("expected runtime error");
-                }
+            Ok(expr) => match interpreter.evaluate(&expr) {
+                Ok(value) => assert_eq!(value, MankaiObject::String(String::from("bar"))),
+                Err(err) => panic!(err.message),
             }
             Err(err) => panic!(err.message),
         }
