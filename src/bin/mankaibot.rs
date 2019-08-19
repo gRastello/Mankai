@@ -57,9 +57,17 @@ fn main() {
         }
     });
 
-    // Run the bot.
+    // Setup polling.
+    let polling = bot.polling()
+        .last_n_updates(std::num::NonZeroUsize::new(1).unwrap())
+        .allowed_updates(&[tbot::types::parameters::Updates::Message])
+        .error_handler(|_error| {
+            eprintln!("polling error!");
+        });
+
+    // Start bot.
     println!("Mankaibot running!");
-    bot.polling().start();
+    polling.start();
 }
 
 /// Run an expression from it's String form. Return a Mankai object or an error.
