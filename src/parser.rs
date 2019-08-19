@@ -67,7 +67,7 @@ impl Parser {
     /// Finish parsing a list.
     fn finish_list(&mut self) -> Result<Sexp, ParseError> {
         let mut sexps = Vec::new();
-        sexps.push(self.parse_sexp()?);
+        sexps.push(self.parse()?);
 
         while self.peek().kind != TokenKind::RightParen && !self.is_at_end() {
             sexps.push(self.parse_sexp()?);
@@ -96,7 +96,7 @@ impl Parser {
         if !self.is_at_end() {
             self.parse_sexp()
         } else {
-            Err(ParseError::from_message("no tokens!"))
+            Err(ParseError::from_message("premature EOF!"))
         }
     }
 }
