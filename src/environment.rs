@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use crate::interpreter::{MankaiObject, RuntimeError};
+use crate::native_functions;
 use crate::special_forms;
 use crate::token::*;
 
@@ -20,6 +21,10 @@ impl Environment {
             &Token::new(String::from("set!"), TokenKind::Identifier),
             set,
         );
+
+        // Bring to scope some native functions.
+        let sum = MankaiObject::Native(native_functions::sum);
+        environment.define(&Token::new(String::from("+"), TokenKind::Identifier), sum);
 
         environment
     }

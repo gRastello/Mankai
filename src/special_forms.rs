@@ -11,7 +11,8 @@ pub fn set(
         return Err(RuntimeError::new("expected exacly two arguments to 'set!'"));
     }
 
-    // Get token that identifies the name of the variable.
+    // Get token that identifies the name of the variable. Return an error if
+    // trying to set! a special form of a native function.
     let name = match arguments.get(0).unwrap() {
         Sexp::Atom(token) => token,
         Sexp::List(_) => {
@@ -22,9 +23,17 @@ pub fn set(
     };
 
     if interpreter.is_special_form(name) {
-        return Err(RuntimeError::new(
-            "can't assign to 'set!' because the name is reserved for a special form",
-        ));
+        return Err(RuntimeError::new(&format!(
+            "can't assign to '{}' because the name is reserved for a special form",
+            name.lexeme
+        )));
+    }
+
+    if interpreter.is_native_fucntion(name) {
+        return Err(RuntimeError::new(&format!(
+            "can't assign to '{}' because the name is reserved for a native function",
+            name.lexeme
+        )));
     }
 
     // Get the value to assign.

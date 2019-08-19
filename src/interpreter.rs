@@ -21,7 +21,8 @@ pub enum MankaiObject {
     Number(f64),
     String(String),
     SpecialForm(fn(&mut Interpreter, Vec<&Sexp>) -> Result<MankaiObject, RuntimeError>),
-    // Function and NativeFunction
+    Native(fn(Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError>),
+    // Function (user defined)
 }
 
 impl std::fmt::Debug for MankaiObject {
@@ -30,6 +31,7 @@ impl std::fmt::Debug for MankaiObject {
             MankaiObject::Number(n) => write!(f, "{}", n),
             MankaiObject::String(s) => write!(f, "{}", s),
             MankaiObject::SpecialForm(_) => write!(f, "special form"),
+            MankaiObject::Native(_) => write!(f, "native function"),
         }
     }
 }
@@ -46,6 +48,7 @@ impl PartialEq for MankaiObject {
                 _ => false,
             },
             MankaiObject::SpecialForm(_) => false,
+            MankaiObject::Native(_) => false,
         }
     }
 }
@@ -56,6 +59,22 @@ impl ToString for MankaiObject {
             MankaiObject::Number(n) => n.to_string(),
             MankaiObject::String(s) => s.to_string(),
             MankaiObject::SpecialForm(_) => String::from("<special form>"),
+            MankaiObject::Native(_) => String::from("<native function>"),
+        }
+    }
+}
+
+impl MankaiObject {
+    /// Call the object with arguments.
+    /// It the object is a function call it, if it's something else report a
+    /// runtime error.
+    fn call(&self, arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
+        match self {
+            MankaiObject::Native(function) => function(arguments),
+            _ => Err(RuntimeError::new(&format!(
+                "'{}' is not callable!",
+                self.to_string()
+            ))),
         }
     }
 }
@@ -64,8 +83,10 @@ impl ToString for MankaiObject {
 pub struct Interpreter {
     /// The environment.
     pub environment: Environment,
-    /// Array of reserved names for special forms.
+    /// Vector of reserved names for special forms.
     special_forms: Vec<String>,
+    /// Vector of reserved names for native functions.
+    native_functions: Vec<String>,
 }
 
 impl Default for Interpreter {
@@ -73,6 +94,7 @@ impl Default for Interpreter {
         Interpreter {
             environment: Environment::new(),
             special_forms: vec![String::from("set!")],
+            native_functions: vec![String::from("+")],
         }
     }
 }
@@ -86,6 +108,13 @@ impl Interpreter {
     /// Check if the identifier is reserved for a special form.
     pub fn is_special_form(&self, identifier: &Token) -> bool {
         self.special_forms.iter().any(|s| *s == identifier.lexeme)
+    }
+
+    /// Check if the identifier is reserved for a native function.
+    pub fn is_native_fucntion(&self, identifier: &Token) -> bool {
+        self.native_functions
+            .iter()
+            .any(|s| *s == identifier.lexeme)
     }
 
     /// Evaluate an atom.
@@ -106,7 +135,17 @@ impl Interpreter {
 
         match callee {
             MankaiObject::SpecialForm(special_form) => special_form(self, arguments),
-            _ => Err(RuntimeError::new("I can't call functions yet!")),
+            _ => {
+                // Evaluate the arguments.
+                let mut evaluated_arguments = Vec::new();
+                for expr in arguments {
+                    let value = self.evaluate(expr)?;
+                    evaluated_arguments.push(value);
+                }
+
+                // Call the function.
+                callee.call(evaluated_arguments)
+            }
         }
     }
 
@@ -217,7 +256,7 @@ mod interpreter_test {
             Ok(expr) => match interpreter.evaluate(&expr) {
                 Ok(value) => assert_eq!(value, MankaiObject::String(String::from("bar"))),
                 Err(err) => panic!(err.message),
-            }
+            },
             Err(err) => panic!(err.message),
         }
 
@@ -227,12 +266,12 @@ mod interpreter_test {
         }
 
         parser = Parser::new(lexer.tokens);
-        
+
         match parser.parse() {
             Ok(expr) => match interpreter.evaluate(&expr) {
                 Ok(value) => assert_eq!(value, MankaiObject::String(String::from("bar"))),
                 Err(err) => panic!(err.message),
-            }
+            },
             Err(err) => panic!(err.message),
         }
     }
