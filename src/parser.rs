@@ -101,6 +101,7 @@ impl Parser {
     }
 }
 
+#[cfg(test)]
 mod parser_test {
     use super::{ParseError, Parser, Sexp, Token, TokenKind};
     use crate::lexer::Lexer;

@@ -34,7 +34,7 @@ impl Lexer {
     /// Make a new lexer from some source code.
     pub fn new(source: String) -> Self {
         Lexer {
-            source: source,
+            source,
             tokens: Vec::new(),
             current: 0,
             start: 0,
@@ -161,8 +161,14 @@ impl Lexer {
         let c = self.advance();
         match c {
             ' ' | '\t' | '\n' | '\r' => Ok(()),
-            '(' => Ok(self.add_token(TokenKind::LeftParen)),
-            ')' => Ok(self.add_token(TokenKind::RightParen)),
+            '(' => {
+                self.add_token(TokenKind::LeftParen);
+                Ok(())
+            }
+            ')' => {
+                self.add_token(TokenKind::RightParen);
+                Ok(())
+            }
             '"' => self.finish_string(),
             _ => {
                 if c.is_digit(10) {
@@ -188,6 +194,7 @@ impl Lexer {
     }
 }
 
+#[cfg(test)]
 mod lexer_test {
     use super::{Lexer, Token, TokenKind};
 

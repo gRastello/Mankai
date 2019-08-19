@@ -68,13 +68,19 @@ pub struct Interpreter {
     special_forms: Vec<String>,
 }
 
-impl Interpreter {
-    /// Create a new interpreter.
-    pub fn new() -> Self {
+impl Default for Interpreter {
+    fn default() -> Self {
         Interpreter {
             environment: Environment::new(),
             special_forms: vec![String::from("set!")],
         }
+    }
+}
+
+impl Interpreter {
+    /// Create a new interpreter.
+    pub fn new() -> Self {
+        Interpreter::default()
     }
 
     /// Check if the identifier is reserved for a special form.
@@ -94,7 +100,7 @@ impl Interpreter {
 
     /// Evaluate a list: can result in evaluating a special form or a function
     /// (user-defined or native).
-    fn evaluate_list(&mut self, list: &Vec<Sexp>) -> Result<MankaiObject, RuntimeError> {
+    fn evaluate_list(&mut self, list: &[Sexp]) -> Result<MankaiObject, RuntimeError> {
         let callee = self.evaluate(list.get(0).unwrap())?;
         let arguments: Vec<&Sexp> = list.iter().skip(1).collect();
 
@@ -113,6 +119,7 @@ impl Interpreter {
     }
 }
 
+#[cfg(test)]
 mod interpreter_test {
     use super::{Interpreter, MankaiObject};
     use crate::lexer::Lexer;
