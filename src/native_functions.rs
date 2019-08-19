@@ -114,7 +114,16 @@ pub fn division(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeErr
 
     for (i, value) in arguments.iter().enumerate().skip(1) {
         match value {
-            MankaiObject::Number(n) => result /= n,
+            MankaiObject::Number(n) => {
+                if *n != 0.0 {
+                    result /= n
+                } else {
+                    return Err(RuntimeError::new(&format!(
+                        "can't divide by zero ({}-th argument to '/' is zero)!",
+                        i + 1
+                    )));
+                }
+            }
             _ => {
                 return Err(RuntimeError::new(&format!(
                     "{}-th argument to '/' must be a number!",
