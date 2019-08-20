@@ -57,7 +57,7 @@ impl ToString for MankaiObject {
     fn to_string(&self) -> String {
         match self {
             MankaiObject::Number(n) => n.to_string(),
-            MankaiObject::String(s) => s.to_string(),
+            MankaiObject::String(s) => format!("\"{}\"", s),
             MankaiObject::SpecialForm(_) => String::from("<special form>"),
             MankaiObject::Native(_) => String::from("<native function>"),
         }
