@@ -113,6 +113,21 @@ Return the tail of `l`. If `l` is not a list (or it's the empty list) a runtime 
 => ((3 3))
 ```
 
+### `cons`
+
+`(cons l a b ... z)`
+
+Append `a`, `b`, ..., `z` to `l`. If `l` is not a list a runtime error is reported.
+
+#### Examples
+
+```
+(cons (list 1 2) 3)
+=> (1 2 3)
+(cons (list) 1 2 3)
+=> (1 2 3)
+```
+
 ### `list`
 
 `(list arg1 arg2 ... argn)`

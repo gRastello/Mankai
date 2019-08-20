@@ -50,6 +50,12 @@ impl Environment {
         let cdr = MankaiObject::Native(native_functions::cdr);
         environment.define(&Token::new(String::from("cdr"), TokenKind::Identifier), cdr);
 
+        let cons = MankaiObject::Native(native_functions::cons);
+        environment.define(
+            &Token::new(String::from("cons"), TokenKind::Identifier),
+            cons,
+        );
+
         let list = MankaiObject::Native(native_functions::list);
         environment.define(
             &Token::new(String::from("list"), TokenKind::Identifier),

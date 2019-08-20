@@ -179,6 +179,28 @@ pub fn cdr(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
     }
 }
 
+/// Cons function. Append to the first argument all the others in the given
+/// order. The first argument must be a list.
+pub fn cons(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
+    // Check arity.
+    if arguments.len() < 2 {
+        return Err(RuntimeError::new("'cons' requires at least two arguments!"));
+    }
+
+    // Do the appending.
+    let first = arguments.get(0).unwrap().clone();
+    match first {
+        MankaiObject::List(mut list) => {
+            for value in arguments.iter().skip(1) {
+                list.push(value.clone());
+            }
+
+            Ok(MankaiObject::List(list))
+        }
+        _ => Err(RuntimeError::new("1st argument to 'cons' must be a list")),
+    }
+}
+
 /// Create a new Mankai list from the given Mankai objects.
 pub fn list(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
     let mut list = Vec::new();

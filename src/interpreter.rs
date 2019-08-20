@@ -128,6 +128,7 @@ impl Default for Interpreter {
                 String::from("/"),
                 String::from("car"),
                 String::from("cdr"),
+                String::from("cons"),
                 String::from("list"),
                 String::from("string-concat"),
                 String::from("to-string"),
