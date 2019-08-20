@@ -136,6 +136,30 @@ pub fn division(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeErr
     Ok(MankaiObject::Number(result))
 }
 
+/// Logic AND with unfixed arity.
+pub fn and(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
+    // Check arity.
+    if arguments.is_empty() {
+        return Err(RuntimeError::new("'and' requires at least one argument!"));
+    }
+
+    // Perform and.
+    for (i, value) in arguments.iter().enumerate() {
+        match value {
+            MankaiObject::Bool(false) => return Ok(MankaiObject::Bool(false)),
+            MankaiObject::Bool(true) => (),
+            _ => {
+                return Err(RuntimeError::new(&format!(
+                    "{}-th argument to 'and' is not a boolean!",
+                    i + 1
+                )))
+            }
+        }
+    }
+
+    Ok(MankaiObject::Bool(true))
+}
+
 /// Analogue of lisp's iconic `car`: get the head of a list.
 pub fn car(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
     // Check arity.

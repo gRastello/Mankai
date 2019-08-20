@@ -44,6 +44,9 @@ impl Environment {
             division,
         );
 
+        let and = MankaiObject::Native(native_functions::and);
+        environment.define(&Token::new(String::from("and"), TokenKind::Identifier), and);
+
         let car = MankaiObject::Native(native_functions::car);
         environment.define(&Token::new(String::from("car"), TokenKind::Identifier), car);
 

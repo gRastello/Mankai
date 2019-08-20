@@ -83,6 +83,21 @@ When `/` is used as a unary operator it returns the multiplicative inverse of th
 => 0.5
 ```
 
+### `and`
+
+`(and b1 ... bn)`
+
+Boolean and of `b1`, ..., `bn` (equivalent to `b1 && b2 && ... && bn`). A runtime error is reported if any of the arguments is not a boolean.
+
+#### Examples
+
+```
+(and true true)
+=> true
+(and false true)
+=> false
+```
+
 ### `car`
 
 `(car l)`
