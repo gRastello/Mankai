@@ -164,6 +164,21 @@ Return the list `(arg1 arg2 ... argn)`.
 => ("foo" "bar")
 ```
 
+### `not`
+
+`(not b)`
+
+Return the negation of `b`. If `b` is not a boolean then a runtime error is reported.
+
+#### Examples
+
+```
+(not true)
+=> false
+(not false)
+=> true
+```
+
 ### `or`
 
 `(or b1 b2 ... bn)`

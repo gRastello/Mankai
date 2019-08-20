@@ -236,6 +236,20 @@ pub fn list(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> 
     Ok(MankaiObject::List(list))
 }
 
+/// Logic NOR.
+pub fn not(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
+    // Check arity.
+    if arguments.len() != 1 {
+        return Err(RuntimeError::new("'not' requires exactly one argument!"));
+    }
+
+    match arguments.get(0).unwrap() {
+        MankaiObject::Bool(true) => Ok(MankaiObject::Bool(false)),
+        MankaiObject::Bool(false) => Ok(MankaiObject::Bool(true)),
+        _ => Err(RuntimeError::new("1st argument to 'not' is not a boolean!")),
+    }
+}
+
 /// Logic OR with unfixed arity.
 pub fn or(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
     // Check arity.

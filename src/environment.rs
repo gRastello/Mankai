@@ -65,6 +65,9 @@ impl Environment {
             list,
         );
 
+        let not = MankaiObject::Native(native_functions::not);
+        environment.define(&Token::new(String::from("not"), TokenKind::Identifier), not);
+
         let or = MankaiObject::Native(native_functions::or);
         environment.define(&Token::new(String::from("or"), TokenKind::Identifier), or);
 
