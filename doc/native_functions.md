@@ -98,6 +98,21 @@ Return the first element of `l`. If `l` is not a list (or it's the empty list) a
 => ()
 ```
 
+### `cdr`
+
+`(cdr l)`
+
+Return the tail of `l`. If `l` is not a list (or it's the empty list) a runtime error is reported.
+
+#### Examples
+
+```
+(cdr (list 1 2 3))
+=> (2 3)
+(cdr (list (list 1 2) (list 3 3)))
+=> ((3 3))
+```
+
 ### `list`
 
 `(list arg1 arg2 ... argn)`

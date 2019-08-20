@@ -155,6 +155,33 @@ pub fn car(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
     }
 }
 
+/// Analogue of lisp's `cdr`: get the tail of a list.
+pub fn cdr(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
+    // Check arity.
+    if arguments.len() != 1 {
+        return Err(RuntimeError::new("'cdr' requires exectly one argument!"));
+    }
+
+    match arguments.get(0).unwrap() {
+        MankaiObject::List(list) => {
+            if list.is_empty() {
+                Err(RuntimeError::new("can't apply 'cdr' to the empty list!"))
+            } else {
+                let mut cdr = Vec::new();
+
+                for (i, value) in list.iter().enumerate() {
+                    if i != 0 {
+                        cdr.push(value.clone());
+                    }
+                }
+
+                Ok(MankaiObject::List(cdr))
+            }
+        }
+        _ => Err(RuntimeError::new("1st argument to 'car' must be a list!")),
+    }
+}
+
 /// Create a new Mankai list from the given Mankai objects.
 pub fn list(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
     let mut list = Vec::new();

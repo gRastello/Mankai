@@ -47,6 +47,9 @@ impl Environment {
         let car = MankaiObject::Native(native_functions::car);
         environment.define(&Token::new(String::from("car"), TokenKind::Identifier), car);
 
+        let cdr = MankaiObject::Native(native_functions::cdr);
+        environment.define(&Token::new(String::from("cdr"), TokenKind::Identifier), cdr);
+
         let list = MankaiObject::Native(native_functions::list);
         environment.define(
             &Token::new(String::from("list"), TokenKind::Identifier),
