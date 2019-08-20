@@ -67,7 +67,7 @@ impl Parser {
     /// Finish parsing a list.
     fn finish_list(&mut self) -> Result<Sexp, ParseError> {
         let mut sexps = Vec::new();
-        sexps.push(self.parse()?);
+        sexps.push(self.parse_sexp()?);
 
         while self.peek().kind != TokenKind::RightParen && !self.is_at_end() {
             sexps.push(self.parse_sexp()?);
@@ -83,20 +83,28 @@ impl Parser {
 
     /// Parse a single sexp.
     fn parse_sexp(&mut self) -> Result<Sexp, ParseError> {
-        let token = self.advance();
-
-        match token.kind {
-            TokenKind::LeftParen => self.finish_list(),
-            TokenKind::RightParen => Err(ParseError::new("expected atom or list", token)),
-            _ => Ok(Sexp::Atom(token.clone())),
+        if self.is_at_end() {
+            Err(ParseError::from_message("premature EOF!"))
+        } else {
+            let token = self.advance();
+            match token.kind {
+                TokenKind::LeftParen => self.finish_list(),
+                TokenKind::RightParen => Err(ParseError::new("expected atom or list", token)),
+                _ => Ok(Sexp::Atom(token.clone())),
+            }
         }
     }
 
     pub fn parse(&mut self) -> Result<Sexp, ParseError> {
+        // Parse one sexp.
+        let sexp = self.parse_sexp()?;
+
         if !self.is_at_end() {
-            self.parse_sexp()
+            Err(ParseError::from_message(
+                "Please input only one expression at a time!",
+            ))
         } else {
-            Err(ParseError::from_message("premature EOF!"))
+            Ok(sexp)
         }
     }
 }
