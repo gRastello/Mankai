@@ -168,11 +168,8 @@ pub fn cdr(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
                 Err(RuntimeError::new("can't apply 'cdr' to the empty list!"))
             } else {
                 let mut cdr = Vec::new();
-
-                for (i, value) in list.iter().enumerate() {
-                    if i != 0 {
-                        cdr.push(value.clone());
-                    }
+                for value in list.iter().skip(1) {
+                    cdr.push(value.clone());
                 }
 
                 Ok(MankaiObject::List(cdr))
