@@ -136,6 +136,25 @@ pub fn division(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeErr
     Ok(MankaiObject::Number(result))
 }
 
+/// Analogue of lisp's iconic `car`: get the head of a list.
+pub fn car(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
+    // Check arity.
+    if arguments.len() != 1 {
+        return Err(RuntimeError::new("'car' requires exectly one argument!"));
+    }
+
+    match arguments.get(0).unwrap() {
+        MankaiObject::List(list) => {
+            if list.is_empty() {
+                Err(RuntimeError::new("can't apply 'car' to the empty list!"))
+            } else {
+                Ok(list.get(0).unwrap().clone())
+            }
+        }
+        _ => Err(RuntimeError::new("1st argument to 'car' must be a list!")),
+    }
+}
+
 /// Create a new Mankai list from the given Mankai objects.
 pub fn list(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
     let mut list = Vec::new();

@@ -8,7 +8,7 @@ Natives act like any other function, but are not implemented in Mankai.
 `(+ n1 n2 ... nm)`
 
 Where `n1`, `n2`, ..., `nm` are all numbers return the sum of all the arguments i.e. `n1 + n2 + ... + nm`. A runtime error is reported if any of the given arguments do not evaluate to a number.
-
+n
 #### Using `+` as unary operator
 When `+` is used as a unary operator it just returns its argument i.e. `(+ n)` is equivalent to `n` with the exception that if `n` does not evaluate to a number then a runtime error is reported.
 
@@ -81,6 +81,21 @@ When `/` is used as a unary operator it returns the multiplicative inverse of th
 => 0.25
 (/ 2)
 => 0.5
+```
+
+### `car`
+
+`(car l)`
+
+Return the first element of `l`. If `l` is not a list (or it's the empty list) a runtime error is reported.
+
+#### Examples
+
+```
+(car (list 1 2 3))
+=> 1
+(car (list (list) 2))
+=> ()
 ```
 
 ### `list`
