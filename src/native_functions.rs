@@ -161,3 +161,20 @@ pub fn string_concat(arguments: Vec<MankaiObject>) -> Result<MankaiObject, Runti
 
     Ok(MankaiObject::String(result))
 }
+
+/// Convert a mankai object to a Mankai string.
+pub fn to_string(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
+    // Check arity.
+    if arguments.len() != 1 {
+        return Err(RuntimeError::new(
+            "'to-string' requires exactly one argument!",
+        ));
+    }
+
+    // Perform conversion.
+    let value = arguments.get(0).unwrap();
+    match value {
+        MankaiObject::String(_) => Ok(value.clone()),
+        _ => Ok(MankaiObject::String(value.to_string())),
+    }
+}

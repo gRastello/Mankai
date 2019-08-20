@@ -50,6 +50,12 @@ impl Environment {
             string_concat,
         );
 
+        let to_string = MankaiObject::Native(native_functions::to_string);
+        environment.define(
+            &Token::new(String::from("to-string"), TokenKind::Identifier),
+            to_string,
+        );
+
         environment
     }
 

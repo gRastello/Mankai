@@ -100,6 +100,7 @@ impl Default for Interpreter {
                 String::from("*"),
                 String::from("/"),
                 String::from("string-concat"),
+                String::from("to-string"),
             ],
         }
     }
