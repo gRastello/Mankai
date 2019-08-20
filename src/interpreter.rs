@@ -20,6 +20,7 @@ impl RuntimeError {
 pub enum MankaiObject {
     Number(f64),
     String(String),
+    List(Vec<MankaiObject>),
     SpecialForm(fn(&mut Interpreter, Vec<&Sexp>) -> Result<MankaiObject, RuntimeError>),
     Native(fn(Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError>),
     // Function (user defined)
@@ -30,6 +31,16 @@ impl std::fmt::Debug for MankaiObject {
         match self {
             MankaiObject::Number(n) => write!(f, "{}", n),
             MankaiObject::String(s) => write!(f, "{}", s),
+            MankaiObject::List(list) => {
+                write!(f, "( ")?;
+
+                for elem in list {
+                    elem.fmt(f)?;
+                    write!(f, " ")?;
+                }
+
+                write!(f, " )")
+            }
             MankaiObject::SpecialForm(_) => write!(f, "special form"),
             MankaiObject::Native(_) => write!(f, "native function"),
         }
@@ -47,6 +58,10 @@ impl PartialEq for MankaiObject {
                 MankaiObject::String(t) => s == t,
                 _ => false,
             },
+            MankaiObject::List(l1) => match other {
+                MankaiObject::List(l2) => l1 == l2,
+                _ => false,
+            },
             MankaiObject::SpecialForm(_) => false,
             MankaiObject::Native(_) => false,
         }
@@ -58,6 +73,18 @@ impl ToString for MankaiObject {
         match self {
             MankaiObject::Number(n) => n.to_string(),
             MankaiObject::String(s) => format!("\"{}\"", s),
+            MankaiObject::List(list) => {
+                let mut s = String::from("(");
+                for (i, elem) in list.iter().enumerate() {
+                    if i != 0 {
+                        s.push(' ');
+                    }
+                    s.push_str(&elem.to_string());
+                }
+                s.push(')');
+
+                s
+            }
             MankaiObject::SpecialForm(_) => String::from("<special form>"),
             MankaiObject::Native(_) => String::from("<native function>"),
         }
