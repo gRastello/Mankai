@@ -2,7 +2,7 @@
 Mankai is a toy programming language designed to be run on Telegram bots. It's dynamically typed and has a lisp-like syntax.
 
 ## Types
-Mankai objects can currently be of five kinds: numbers, strings, lists, special forms or native functions. Mankai numbers are always 64-bit floats, Mankai lists can contain items of mixed types, the empty list is a valid list.
+Mankai objects can currently be of six kinds: numbers, strings, bools, lists, special forms or native functions. Mankai numbers are always 64-bit floats, booleans can obviously be only true or false, Mankai lists can contain items of mixed types, the empty list is a valid list.
 
 ## Examples
 If you fire up the REPL you can start typing in some expressions:

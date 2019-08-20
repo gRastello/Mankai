@@ -21,6 +21,7 @@ pub enum MankaiObject {
     Number(f64),
     String(String),
     List(Vec<MankaiObject>),
+    Bool(bool),
     SpecialForm(fn(&mut Interpreter, Vec<&Sexp>) -> Result<MankaiObject, RuntimeError>),
     Native(fn(Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError>),
     // Function (user defined)
@@ -41,6 +42,8 @@ impl std::fmt::Debug for MankaiObject {
 
                 write!(f, " )")
             }
+            MankaiObject::Bool(true) => write!(f, "true"),
+            MankaiObject::Bool(false) => write!(f, "false"),
             MankaiObject::SpecialForm(_) => write!(f, "special form"),
             MankaiObject::Native(_) => write!(f, "native function"),
         }
@@ -60,6 +63,10 @@ impl PartialEq for MankaiObject {
             },
             MankaiObject::List(l1) => match other {
                 MankaiObject::List(l2) => l1 == l2,
+                _ => false,
+            },
+            MankaiObject::Bool(b1) => match other {
+                MankaiObject::Bool(b2) => b1 == b2,
                 _ => false,
             },
             MankaiObject::SpecialForm(_) => false,
@@ -85,6 +92,8 @@ impl ToString for MankaiObject {
 
                 s
             }
+            MankaiObject::Bool(true) => String::from("true"),
+            MankaiObject::Bool(false) => String::from("false"),
             MankaiObject::SpecialForm(_) => String::from("<special form>"),
             MankaiObject::Native(_) => String::from("<native function>"),
         }
@@ -114,6 +123,8 @@ pub struct Interpreter {
     special_forms: Vec<String>,
     /// Vector of reserved names for native functions.
     native_functions: Vec<String>,
+    /// Vector of reserved names for constants.
+    constants: Vec<String>,
 }
 
 impl Default for Interpreter {
@@ -133,6 +144,7 @@ impl Default for Interpreter {
                 String::from("string-concat"),
                 String::from("to-string"),
             ],
+            constants: vec![String::from("true"), String::from("false")],
         }
     }
 }
@@ -153,6 +165,11 @@ impl Interpreter {
         self.native_functions
             .iter()
             .any(|s| *s == identifier.lexeme)
+    }
+
+    /// Check if the identifier is reserved for a constant.
+    pub fn is_constant(&self, identifier: &Token) -> bool {
+        self.constants.iter().any(|s| *s == identifier.lexeme)
     }
 
     /// Evaluate an atom.

@@ -47,6 +47,13 @@ pub fn set(
         )));
     }
 
+    if interpreter.is_constant(name) {
+        return Err(RuntimeError::new(&format!(
+            "can't assign to '{}' because the name is reserved for a constant!",
+            name.lexeme
+        )));
+    }
+
     // Get the value to assign.
     let value = interpreter.evaluate(arguments.get(1).unwrap())?;
     let value_clone = value.clone();

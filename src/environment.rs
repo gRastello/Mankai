@@ -74,6 +74,17 @@ impl Environment {
             to_string,
         );
 
+        // Bring to scope some constants.
+        environment.define(
+            &Token::new(String::from("true"), TokenKind::Identifier),
+            MankaiObject::Bool(true),
+        );
+
+        environment.define(
+            &Token::new(String::from("false"), TokenKind::Identifier),
+            MankaiObject::Bool(false),
+        );
+
         environment
     }
 
