@@ -136,6 +136,17 @@ pub fn division(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeErr
     Ok(MankaiObject::Number(result))
 }
 
+/// Create a new Mankai list from the given Mankai objects.
+pub fn list(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
+    let mut list = Vec::new();
+
+    for object in arguments {
+        list.push(object);
+    }
+
+    Ok(MankaiObject::List(list))
+}
+
 /// Concatenate strings.
 pub fn string_concat(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
     // Check arity.

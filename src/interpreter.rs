@@ -126,6 +126,7 @@ impl Default for Interpreter {
                 String::from("-"),
                 String::from("*"),
                 String::from("/"),
+                String::from("list"),
                 String::from("string-concat"),
                 String::from("to-string"),
             ],

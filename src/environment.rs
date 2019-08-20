@@ -44,6 +44,12 @@ impl Environment {
             division,
         );
 
+        let list = MankaiObject::Native(native_functions::list);
+        environment.define(
+            &Token::new(String::from("list"), TokenKind::Identifier),
+            list,
+        );
+
         let string_concat = MankaiObject::Native(native_functions::string_concat);
         environment.define(
             &Token::new(String::from("string-concat"), TokenKind::Identifier),

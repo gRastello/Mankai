@@ -7,7 +7,7 @@ Natives act like any other function, but are not implemented in Mankai.
 
 `(+ n1 n2 ... nm)`
 
-Where `n1`, `n2`, ..., `nm` are all expressions that evaluate to numbers return the sum of all the arguments i.e. `n1 + n2 + ... + nm`. A runtime error is reported if any of the given arguments do not evaluate to a number.
+Where `n1`, `n2`, ..., `nm` are all numbers return the sum of all the arguments i.e. `n1 + n2 + ... + nm`. A runtime error is reported if any of the given arguments do not evaluate to a number.
 
 #### Using `+` as unary operator
 When `+` is used as a unary operator it just returns its argument i.e. `(+ n)` is equivalent to `n` with the exception that if `n` does not evaluate to a number then a runtime error is reported.
@@ -27,7 +27,7 @@ When `+` is used as a unary operator it just returns its argument i.e. `(+ n)` i
 
 `(- n1 n2 ... nm)`
 
-Where `n1`, `n2`, ..., `nm` are all expressions that evaluate to numbers returns the result of `n1 - n2 - ... - nm`. A runtime error is reported if any of the given arguments do not evaluate to a number.
+Where `n1`, `n2`, ..., `nm` are all numbers returns the result of `n1 - n2 - ... - nm`. A runtime error is reported if any of the given arguments do not evaluate to a number.
 
 #### Using `-` as unary operator
 When `-` is used as a unary operator it returns the inverse its argument.
@@ -47,7 +47,7 @@ When `-` is used as a unary operator it returns the inverse its argument.
 
 `(* n1 n2 ... nm)`
 
-Where `n1`, `n2`, ..., `nm` are all expressions that evaluate to numbers returns the multiplication of all arguments together i.e. `n1 * n2 * ... * nm`. A runtime error is reported if any of the given arguments do not evaluate to a number.
+Where `n1`, `n2`, ..., `nm` are all numbers returns the multiplication of all arguments together i.e. `n1 * n2 * ... * nm`. A runtime error is reported if any of the given arguments do not evaluate to a number.
 
 #### Using `*` as unary operator
 When `*` is used as a unary operator it just returns its argument i.e. `(* n)` is equivalent to `n` with the exception that if `n` does not evaluate to a number then a runtime error is reported.
@@ -67,7 +67,7 @@ When `*` is used as a unary operator it just returns its argument i.e. `(* n)` i
 
 `(/ n1 n2 ... nm)`
 
-Where `n1`, `n2`, ..., `nm` are all expressions that evaluate to numbers return the result of `n1 / n2 / ... / nm`. A runtime error is reported if any of the given arguments do not evaluate to a number.
+Where `n1`, `n2`, ..., `nm` are all numbers return the result of `n1 / n2 / ... / nm`. A runtime error is reported if any of the given arguments do not evaluate to a number.
 
 #### Using `/` as a unary operator
 When `/` is used as a unary operator it returns the multiplicative inverse of the given argument i.e. `(/ n)` evaluates to `1 / n` (if `n` evaluates to a number, otherwise a runtime error is reported).
@@ -83,11 +83,29 @@ When `/` is used as a unary operator it returns the multiplicative inverse of th
 => 0.5
 ```
 
+### `list`
+
+`(list arg1 arg2 ... argn)`
+
+Return the list `(arg1 arg2 ... argn)`.
+
+#### Using `list` with no arguments
+`list` can be used with no arguments and will produce the empty list `()`.
+
+#### Examples
+
+```
+(list 1 2 3)
+=> (1 2 3)
+(list "foo" "bar")
+=> ("foo" "bar")
+```
+
 ### `string-concat`
 
 `(string-concat s1 s2 ... sn)`
 
-Where `s1`, `s1`, ..., `sm` are all expressions that evaluate to strings return the concatenation of those strings. A runtime error is reported if any of the given arguments do not evaluate to a string.
+Where `s1`, `s1`, ..., `sm` are all strings return the concatenation of those strings. A runtime error is reported if any of the given arguments do not evaluate to a string.
 
 #### Using `string-concat` as a unary operator
 When `string-concat` is used as a unary operator the given argument is returned unchanged (a runtime error is still reported if its not a string).
