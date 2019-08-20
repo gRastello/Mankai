@@ -65,6 +65,9 @@ impl Environment {
             list,
         );
 
+        let or = MankaiObject::Native(native_functions::or);
+        environment.define(&Token::new(String::from("or"), TokenKind::Identifier), or);
+
         let string_concat = MankaiObject::Native(native_functions::string_concat);
         environment.define(
             &Token::new(String::from("string-concat"), TokenKind::Identifier),

@@ -236,6 +236,30 @@ pub fn list(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> 
     Ok(MankaiObject::List(list))
 }
 
+/// Logic OR with unfixed arity.
+pub fn or(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
+    // Check arity.
+    if arguments.is_empty() {
+        return Err(RuntimeError::new("'or' requires at least one argument!"));
+    }
+
+    // Perform OR.
+    for (i, value) in arguments.iter().enumerate() {
+        match value {
+            MankaiObject::Bool(true) => return Ok(MankaiObject::Bool(true)),
+            MankaiObject::Bool(false) => (),
+            _ => {
+                return Err(RuntimeError::new(&format!(
+                    "{}-th argument to 'or' is nor a boolean!",
+                    i + 1
+                )))
+            }
+        }
+    }
+
+    Ok(MankaiObject::Bool(false))
+}
+
 /// Concatenate strings.
 pub fn string_concat(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
     // Check arity.

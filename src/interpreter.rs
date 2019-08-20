@@ -142,6 +142,7 @@ impl Default for Interpreter {
                 String::from("cdr"),
                 String::from("cons"),
                 String::from("list"),
+                String::from("or"),
                 String::from("string-concat"),
                 String::from("to-string"),
             ],

@@ -89,6 +89,9 @@ When `/` is used as a unary operator it returns the multiplicative inverse of th
 
 Boolean and of `b1`, ..., `bn` (equivalent to `b1 && b2 && ... && bn`). A runtime error is reported if any of the arguments is not a boolean.
 
+#### Using `and` as unary operator
+When used as a unary operator `and` just returns its argument unchanged (or report a runtime error if the argument is not a boolean).
+
 #### Examples
 
 ```
@@ -159,6 +162,24 @@ Return the list `(arg1 arg2 ... argn)`.
 => (1 2 3)
 (list "foo" "bar")
 => ("foo" "bar")
+```
+
+### `or`
+
+`(or b1 b2 ... bn)`
+
+Boolean or of `b1`, `b2`, ..., `bn` (equivalent to `b1 || b2 || ... || bn`). A runtime error is report if any of the arguments is not a boolean.
+
+#### Using `or` as unary operator
+When used as a unary operator `or` just returns its argument unchanged (or report a runtime error if the argument is not a boolean).
+
+#### Examples
+
+```
+(or true false)
+=> true
+(or false false)
+=> false
 ```
 
 ### `string-concat`
