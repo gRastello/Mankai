@@ -136,6 +136,19 @@ pub fn division(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeErr
     Ok(MankaiObject::Number(result))
 }
 
+/// == implementation.
+pub fn equals(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
+    // Check arity.
+    if arguments.len() != 2 {
+        return Err(RuntimeError::new("'==' requires exactly two arguments!"));
+    }
+
+    let left = arguments.get(0).unwrap();
+    let right = arguments.get(1).unwrap();
+
+    Ok(MankaiObject::Bool(left == right))
+}
+
 /// Logic AND with unfixed arity.
 pub fn and(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
     // Check arity.

@@ -44,6 +44,12 @@ impl Environment {
             division,
         );
 
+        let equals = MankaiObject::Native(native_functions::equals);
+        environment.define(
+            &Token::new(String::from("="), TokenKind::Identifier),
+            equals,
+        );
+
         let and = MankaiObject::Native(native_functions::and);
         environment.define(&Token::new(String::from("and"), TokenKind::Identifier), and);
 

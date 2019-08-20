@@ -83,6 +83,23 @@ When `/` is used as a unary operator it returns the multiplicative inverse of th
 => 0.5
 ```
 
+### `=`
+
+`(= left righ)`
+
+Return true if `left` is equal to `right`. Does not panic under any circumstance but you should note that only comparisons between the same type are meaningful (comparing, say, a string to a number or to a boolean will always be false). Also if `left` or `right` happen to be special forms or functions then (even if they are effectively the "same") `=` will always evaluate to false.
+
+#### Examples
+
+```
+(= 1 1)
+=> true
+(= "foo" "bar")
+=> false
+(= "true" true)
+=> false
+```
+
 ### `and`
 
 `(and b1 ... bn)`
@@ -145,7 +162,7 @@ Append `a`, `b`, ..., `z` to `l`. If `l` is not a list a runtime error is report
 (cons (list) 1 2 3)
 => (1 2 3)
 ```
-
+	
 ### `list`
 
 `(list arg1 arg2 ... argn)`
