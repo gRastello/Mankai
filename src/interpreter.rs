@@ -102,7 +102,7 @@ impl ToString for MankaiObject {
             MankaiObject::Bool(false) => String::from("false"),
             MankaiObject::SpecialForm(_) => String::from("<special form>"),
             MankaiObject::Native(_) => String::from("<native function>"),
-            MankaiObject::Function { .. } => String::from("<user-defined fucntion>"),
+            MankaiObject::Function { .. } => String::from("<user-defined function>"),
         }
     }
 }
