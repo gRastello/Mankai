@@ -1,6 +1,7 @@
 use std::{env, process};
 
 use tbot::prelude::*;
+use tbot::types::message::text::EntityKind;
 
 use mankailib::{Interpreter, Lexer, MankaiError, MankaiObject, Parser};
 
@@ -23,7 +24,7 @@ fn main() {
         // Extract all expressions to evaluate from the message.
         let mut expressions = Vec::new();
         for entity in context.text.entities.iter() {
-            if let tbot::types::message::text::EntityKind::Code = entity.kind {
+            if let EntityKind::Code | EntityKind::Pre = entity.kind {
                 let expr: String = context
                     .text
                     .value
