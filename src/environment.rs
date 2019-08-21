@@ -161,9 +161,8 @@ impl Environment {
     pub fn get(&self, identifier: &Token) -> Result<MankaiObject, RuntimeError> {
         // Start searching for the key from the outermost layer.
         for layer in self.layers.iter().rev() {
-            match layer.get(&identifier.lexeme) {
-                Some(value) => return Ok(value.clone()),
-                None => (),
+            if let Some(value) = layer.get(&identifier.lexeme) {
+                return Ok(value.clone());
             }
         }
 
@@ -172,6 +171,21 @@ impl Environment {
             "unboud symbol '{}'",
             identifier.lexeme
         )))
+    }
+
+    /// Extend the environment with a new layer.
+    pub fn extend(&mut self) {
+        self.layers.push(HashMap::new());
+    }
+
+    /// Remove the last layer of the environment (panics if trying to remove the
+    /// global scope).
+    pub fn restrict(&mut self) {
+        if self.layers.len() > 1 {
+            self.layers.pop();
+        } else {
+            panic!("trying to remove global scope");
+        }
     }
 }
 
@@ -192,23 +206,82 @@ mod environment_test {
         );
 
         environment.define(
-            &Token::new(String::from("bar"), TokenKind::String(String::from("baz"))),
+            &Token::new(String::from("bar"), TokenKind::Identifier),
             MankaiObject::String(String::from("baz")),
         );
 
         // Try to get them out and test runtime errors.
         match environment.get(&Token::new(String::from("foo"), TokenKind::Identifier)) {
             Ok(value) => assert_eq!(value, MankaiObject::Number(6.0)),
-            Err(err) => panic!(err),
+            Err(err) => panic!(err.message),
         }
 
         match environment.get(&Token::new(String::from("bar"), TokenKind::Identifier)) {
             Ok(value) => assert_eq!(value, MankaiObject::String(String::from("baz"))),
-            Err(err) => panic!(err),
+            Err(err) => panic!(err.message),
         }
 
         if let Ok(_) = environment.get(&Token::new(String::from("oof"), TokenKind::Identifier)) {
             panic!("found nonexistent binding");
+        }
+    }
+
+    #[test]
+    fn layers() {
+        let mut environment = Environment::new();
+
+        // Put something in the global scope.
+        environment.define(
+            &Token::new(String::from("foo"), TokenKind::Identifier),
+            MankaiObject::Number(6.0),
+        );
+
+        environment.define(
+            &Token::new(String::from("bar"), TokenKind::Identifier),
+            MankaiObject::String(String::from("baz")),
+        );
+
+        // Extend the environment and define something again.
+        environment.extend();
+
+        environment.define(
+            &Token::new(String::from("foo"), TokenKind::Identifier),
+            MankaiObject::Number(12.0),
+        );
+
+        environment.define(
+            &Token::new(String::from("baz"), TokenKind::Identifier),
+            MankaiObject::Number(0.0),
+        );
+
+        // Check that the extended environment acts properly.
+        match environment.get(&Token::new(String::from("foo"), TokenKind::Identifier)) {
+            Ok(value) => assert_eq!(value, MankaiObject::Number(12.0)),
+            Err(err) => panic!(err.message),
+        }
+
+        match environment.get(&Token::new(String::from("bar"), TokenKind::Identifier)) {
+            Ok(value) => assert_eq!(value, MankaiObject::String(String::from("baz"))),
+            Err(err) => panic!(err.message),
+        }
+
+        match environment.get(&Token::new(String::from("baz"), TokenKind::Identifier)) {
+            Ok(value) => assert_eq!(value, MankaiObject::Number(0.0)),
+            Err(err) => panic!(err.message),
+        }
+
+        // Restrict the environment.
+        environment.restrict();
+
+        // Check that the restricted environment acts properly.
+        match environment.get(&Token::new(String::from("foo"), TokenKind::Identifier)) {
+            Ok(value) => assert_eq!(value, MankaiObject::Number(6.0)),
+            Err(err) => panic!(err.message),
+        }
+
+        match environment.get(&Token::new(String::from("bar"), TokenKind::Identifier)) {
+            Ok(value) => assert_eq!(value, MankaiObject::String(String::from("baz"))),
+            Err(err) => panic!(err.message),
         }
     }
 }
