@@ -23,7 +23,7 @@ fn run(source: String, interpreter: &mut Interpreter) -> Result<(), MankaiError>
     let sexp = parser.parse()?;
 
     let value = interpreter.evaluate(&sexp)?;
-    println!("{}", value.to_string());
+    println!("=> {}", value.to_string());
 
     Ok(())
 }
