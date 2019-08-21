@@ -176,7 +176,11 @@ impl Default for Interpreter {
     fn default() -> Self {
         Interpreter {
             environment: Environment::new(),
-            special_forms: vec![String::from("if!"), String::from("set!")],
+            special_forms: vec![
+                String::from("if!"),
+                String::from("lambda!"),
+                String::from("set!"),
+            ],
             native_functions: vec![
                 String::from("+"),
                 String::from("-"),
