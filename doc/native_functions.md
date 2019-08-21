@@ -130,6 +130,58 @@ Perform the comparison and return a boolean. A runtime error is reported if any 
 => false
 ```
 
+### `bool?`
+
+`(bool? value)`
+
+Return true if `value` is a boolean, false otherwise.
+
+#### Examples
+
+```
+(bool? false)
+=> true
+```
+
+### `number?`
+
+`(number? value)`
+
+Return true if `value` is a number, false otherwise.
+
+#### Examples
+
+```
+(number? 4.5)
+=> true
+```
+
+### `list?`
+
+`(list? value)`
+
+Return true if `value` is a list, false otherwise.
+
+#### Examples
+
+```
+(list? (list 1 2 3))
+=> true
+```
+
+### `string?`
+
+`(string? value)`
+
+Return true if `value` is a string, false otherwise.
+
+#### Examples
+
+```
+(string? "foo")
+=> true
+```
+
 ### `and`
 
 `(and b1 ... bn)`

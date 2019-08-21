@@ -1,5 +1,7 @@
 use crate::interpreter::{MankaiObject, RuntimeError};
 
+// Functions with symbolic names (such as '+', '-', ...).
+
 /// Sum all the arguments. Return an error if a non numeric argument is found
 /// or no arguments are found at all.
 pub fn sum(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
@@ -189,6 +191,8 @@ pub fn less_than(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeEr
     Ok(MankaiObject::Bool(left < right))
 }
 
+// Functions with alfanumeric names.
+
 /// Logic AND with unfixed arity.
 pub fn and(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
     // Check arity.
@@ -275,6 +279,62 @@ pub fn cons(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> 
             Ok(MankaiObject::List(list))
         }
         _ => Err(RuntimeError::new("1st argument to 'cons' must be a list")),
+    }
+}
+
+/// Check if the given argument is a Mankai boolean.
+pub fn is_boolean(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
+    // Check arity. {
+    if arguments.len() != 1 {
+        return Err(RuntimeError::new("'list?' requires exactly one argument!"));
+    }
+
+    match arguments.get(0).unwrap() {
+        MankaiObject::Bool(_) => Ok(MankaiObject::Bool(true)),
+        _ => Ok(MankaiObject::Bool(false)),
+    }
+}
+
+/// Check if the given argument is a Mankai list.
+pub fn is_list(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
+    // Check arity. {
+    if arguments.len() != 1 {
+        return Err(RuntimeError::new("'list?' requires exactly one argument!"));
+    }
+
+    match arguments.get(0).unwrap() {
+        MankaiObject::List(_) => Ok(MankaiObject::Bool(true)),
+        _ => Ok(MankaiObject::Bool(false)),
+    }
+}
+
+/// Check if the given argument is a Mankai number.
+pub fn is_number(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
+    // Check arity. {
+    if arguments.len() != 1 {
+        return Err(RuntimeError::new(
+            "'number?' requires exactly one argument!",
+        ));
+    }
+
+    match arguments.get(0).unwrap() {
+        MankaiObject::Number(_) => Ok(MankaiObject::Bool(true)),
+        _ => Ok(MankaiObject::Bool(false)),
+    }
+}
+
+/// Check if the given argument is a Mankai string.
+pub fn is_string(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
+    // Check arity. {
+    if arguments.len() != 1 {
+        return Err(RuntimeError::new(
+            "'string?' requires exactly one argument!",
+        ));
+    }
+
+    match arguments.get(0).unwrap() {
+        MankaiObject::String(_) => Ok(MankaiObject::Bool(true)),
+        _ => Ok(MankaiObject::Bool(false)),
     }
 }
 

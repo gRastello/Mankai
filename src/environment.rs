@@ -56,6 +56,30 @@ impl Environment {
             greater_than,
         );
 
+        let is_boolean = MankaiObject::Native(native_functions::is_boolean);
+        environment.define(
+            &Token::new(String::from("bool?"), TokenKind::Identifier),
+            is_boolean,
+        );
+
+        let is_list = MankaiObject::Native(native_functions::is_list);
+        environment.define(
+            &Token::new(String::from("list?"), TokenKind::Identifier),
+            is_list,
+        );
+
+        let is_number = MankaiObject::Native(native_functions::is_number);
+        environment.define(
+            &Token::new(String::from("number?"), TokenKind::Identifier),
+            is_number,
+        );
+
+        let is_string = MankaiObject::Native(native_functions::is_string);
+        environment.define(
+            &Token::new(String::from("string?"), TokenKind::Identifier),
+            is_string,
+        );
+
         let less_than = MankaiObject::Native(native_functions::less_than);
         environment.define(
             &Token::new(String::from("<"), TokenKind::Identifier),
