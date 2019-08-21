@@ -3,6 +3,23 @@ A _special form_ in Mankai is a form to which special evaluation rules apply. _S
 
 ## List of special forms
 
+### `if!`
+
+`(if! condition then else)`
+
+If `condition` evaluates to `true` then `then` is evaluated. If `condition` evaluates to `false` then `else` is evaluated. If `condition` does not evaluate to a boolean a runtime error is reaised. Note that the `else` expression is _always required_.
+
+#### Examples
+
+```
+(if! true 1 2)
+=> 1
+(if! false 1 2)
+=> 2
+(if! (= 2 2.5) 1 2)
+=> 2
+```
+
 ### `set!`
 
 `(set! name value)`

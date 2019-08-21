@@ -16,6 +16,12 @@ impl Environment {
         let mut environment = Environment::default();
 
         // Bring to scope some special forms.
+        let if_special_form = MankaiObject::SpecialForm(special_forms::if_special_form);
+        environment.define(
+            &Token::new(String::from("if!"), TokenKind::Identifier),
+            if_special_form,
+        );
+
         let set = MankaiObject::SpecialForm(special_forms::set);
         environment.define(
             &Token::new(String::from("set!"), TokenKind::Identifier),

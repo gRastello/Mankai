@@ -2,6 +2,29 @@ use crate::interpreter::*;
 use crate::parser::Sexp;
 use crate::token::TokenKind;
 
+/// The `if!` special form.
+pub fn if_special_form(
+    interpreter: &mut Interpreter,
+    arguments: Vec<&Sexp>,
+) -> Result<MankaiObject, RuntimeError> {
+    // Check that we have exactly three arguments.
+    if arguments.len() != 3 {
+        return Err(RuntimeError::new("'if!' requires exactly three arguments!"));
+    }
+
+    // Evaluate the condition.
+    let condition = interpreter.evaluate(arguments.get(0).unwrap())?;
+
+    // Evaluate the "then" or the "else" branch accordingly.
+    match condition {
+        MankaiObject::Bool(true) => interpreter.evaluate(arguments.get(1).unwrap()),
+        MankaiObject::Bool(false) => interpreter.evaluate(arguments.get(2).unwrap()),
+        _ => Err(RuntimeError::new(
+            "1st argument to 'if!' must evaluate to a boolean!",
+        )),
+    }
+}
+
 /// The `set!` special form.
 pub fn set(
     interpreter: &mut Interpreter,
