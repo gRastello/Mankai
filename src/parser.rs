@@ -1,7 +1,7 @@
 use crate::token::*;
 
 /// An S-expression (sexp for brevity).
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Sexp {
     Atom(Token),
     List(Vec<Sexp>),
