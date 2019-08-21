@@ -50,6 +50,18 @@ impl Environment {
             equals,
         );
 
+        let greater_than = MankaiObject::Native(native_functions::greater_than);
+        environment.define(
+            &Token::new(String::from(">"), TokenKind::Identifier),
+            greater_than,
+        );
+
+        let less_than = MankaiObject::Native(native_functions::less_than);
+        environment.define(
+            &Token::new(String::from("<"), TokenKind::Identifier),
+            less_than,
+        );
+
         let and = MankaiObject::Native(native_functions::and);
         environment.define(&Token::new(String::from("and"), TokenKind::Identifier), and);
 

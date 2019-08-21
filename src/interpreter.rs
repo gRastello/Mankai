@@ -138,6 +138,8 @@ impl Default for Interpreter {
                 String::from("*"),
                 String::from("/"),
                 String::from("="),
+                String::from(">"),
+                String::from("<"),
                 String::from("and"),
                 String::from("car"),
                 String::from("cdr"),

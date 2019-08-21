@@ -58,7 +58,8 @@ fn main() {
     });
 
     // Setup polling.
-    let polling = bot.polling()
+    let polling = bot
+        .polling()
         .last_n_updates(std::num::NonZeroUsize::new(1).unwrap())
         .allowed_updates(&[tbot::types::parameters::Updates::Message])
         .error_handler(|_error| {

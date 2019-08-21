@@ -100,6 +100,36 @@ Return true if `left` is equal to `right`. Does not panic under any circumstance
 => false
 ```
 
+### `>`
+
+`(> x y)`
+
+Perform the comparison and return a boolean. A runtime error is reported if any of the arguments is not a number.
+
+#### Examples
+
+```
+(> 2 3)
+=> false
+(> 4 3)
+=> true
+```
+
+### `<`
+
+`(< x y)`
+
+Perform the comparison and return a boolean. A runtime error is reported if any of the arguments is not a number.
+
+#### Examples
+
+```
+(< 2 3)
+=> true
+(< 4 3)
+=> false
+```
+
 ### `and`
 
 `(and b1 ... bn)`

@@ -149,6 +149,46 @@ pub fn equals(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError
     Ok(MankaiObject::Bool(left == right))
 }
 
+/// > implementation.
+pub fn greater_than(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
+    // Check arity.
+    if arguments.len() != 2 {
+        return Err(RuntimeError::new("'>' reuires exactly two arguments!"));
+    }
+
+    let left = match arguments.get(0).unwrap() {
+        MankaiObject::Number(n) => n.clone(),
+        _ => return Err(RuntimeError::new("1st argument to '>' must be a number!")),
+    };
+
+    let right = match arguments.get(1).unwrap() {
+        MankaiObject::Number(n) => n.clone(),
+        _ => return Err(RuntimeError::new("2nd argument to '>' must be a number!")),
+    };
+
+    Ok(MankaiObject::Bool(left > right))
+}
+
+/// < implementation.
+pub fn less_than(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
+    // Check arity.
+    if arguments.len() != 2 {
+        return Err(RuntimeError::new("'<' reuires exactly two arguments!"));
+    }
+
+    let left = match arguments.get(0).unwrap() {
+        MankaiObject::Number(n) => n.clone(),
+        _ => return Err(RuntimeError::new("1st argument to '<' must be a number!")),
+    };
+
+    let right = match arguments.get(1).unwrap() {
+        MankaiObject::Number(n) => n.clone(),
+        _ => return Err(RuntimeError::new("2nd argument to '<' must be a number!")),
+    };
+
+    Ok(MankaiObject::Bool(left < right))
+}
+
 /// Logic AND with unfixed arity.
 pub fn and(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
     // Check arity.
