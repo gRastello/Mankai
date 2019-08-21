@@ -5,6 +5,7 @@ use crate::native_functions;
 use crate::special_forms;
 use crate::token::*;
 
+#[derive(Default)]
 pub struct Environment {
     /// Layers maps one-to-one to scopes. Thus the first layer is the global
     /// scope.
@@ -15,7 +16,7 @@ impl Environment {
     /// Make a new environment.
     pub fn new() -> Self {
         // Make a new environment and a void global scope.
-        let mut environment = Environment { layers: Vec::new() };
+        let mut environment = Environment::default();
         environment.layers.push(HashMap::new());
 
         // Bring to scope some special forms.

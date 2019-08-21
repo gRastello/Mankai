@@ -47,7 +47,7 @@ pub fn substract(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeEr
 
     // If there are more arguments perform the right number of substractions.
     let mut result = match arguments.get(0).unwrap() {
-        MankaiObject::Number(n) => n.clone(),
+        MankaiObject::Number(n) => *n,
         _ => return Err(RuntimeError::new("1st arguments to '-' must be a number!")),
     };
 
@@ -110,7 +110,7 @@ pub fn division(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeErr
 
     // Handle the multiple arguments case.
     let mut result = match arguments.get(0).unwrap() {
-        MankaiObject::Number(n) => n.clone(),
+        MankaiObject::Number(n) => *n,
         _ => return Err(RuntimeError::new("1st argument to '/' must be a number!")),
     };
 
@@ -159,12 +159,12 @@ pub fn greater_than(arguments: Vec<MankaiObject>) -> Result<MankaiObject, Runtim
     }
 
     let left = match arguments.get(0).unwrap() {
-        MankaiObject::Number(n) => n.clone(),
+        MankaiObject::Number(n) => *n,
         _ => return Err(RuntimeError::new("1st argument to '>' must be a number!")),
     };
 
     let right = match arguments.get(1).unwrap() {
-        MankaiObject::Number(n) => n.clone(),
+        MankaiObject::Number(n) => *n,
         _ => return Err(RuntimeError::new("2nd argument to '>' must be a number!")),
     };
 
@@ -179,12 +179,12 @@ pub fn less_than(arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeEr
     }
 
     let left = match arguments.get(0).unwrap() {
-        MankaiObject::Number(n) => n.clone(),
+        MankaiObject::Number(n) => *n,
         _ => return Err(RuntimeError::new("1st argument to '<' must be a number!")),
     };
 
     let right = match arguments.get(1).unwrap() {
-        MankaiObject::Number(n) => n.clone(),
+        MankaiObject::Number(n) => *n,
         _ => return Err(RuntimeError::new("2nd argument to '<' must be a number!")),
     };
 
