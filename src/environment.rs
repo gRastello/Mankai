@@ -5,15 +5,18 @@ use crate::native_functions;
 use crate::special_forms;
 use crate::token::*;
 
-#[derive(Default)]
 pub struct Environment {
-    bindings: HashMap<String, MankaiObject>,
+    /// Layers maps one-to-one to scopes. Thus the first layer is the global
+    /// scope.
+    layers: Vec<HashMap<String, MankaiObject>>,
 }
 
 impl Environment {
     /// Make a new environment.
     pub fn new() -> Self {
-        let mut environment = Environment::default();
+        // Make a new environment and a void global scope.
+        let mut environment = Environment { layers: Vec::new() };
+        environment.layers.push(HashMap::new());
 
         // Bring to scope some special forms.
         let if_special_form = MankaiObject::SpecialForm(special_forms::if_special_form);
@@ -147,18 +150,28 @@ impl Environment {
 
     /// Define a new binding.
     pub fn define(&mut self, identifier: &Token, value: MankaiObject) {
-        self.bindings.insert(identifier.lexeme.clone(), value);
+        if let Some(layer) = self.layers.last_mut() {
+            layer.insert(identifier.lexeme.clone(), value);
+        } else {
+            panic!("the environment has no layer!");
+        }
     }
 
     /// Get a value out of the environment.
     pub fn get(&self, identifier: &Token) -> Result<MankaiObject, RuntimeError> {
-        match self.bindings.get(&identifier.lexeme) {
-            Some(value) => Ok(value.clone()),
-            None => Err(RuntimeError::new(&format!(
-                "unboud symbol '{}'",
-                identifier.lexeme
-            ))),
+        // Start searching for the key from the outermost layer.
+        for layer in self.layers.iter().rev() {
+            match layer.get(&identifier.lexeme) {
+                Some(value) => return Ok(value.clone()),
+                None => (),
+            }
         }
+
+        // If nothing is found return a runtime errror.
+        Err(RuntimeError::new(&format!(
+            "unboud symbol '{}'",
+            identifier.lexeme
+        )))
     }
 }
 
