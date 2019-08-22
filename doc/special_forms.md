@@ -20,6 +20,21 @@ If `condition` evaluates to `true` then `then` is evaluated. If `condition` eval
 => 2
 ```
 
+### `lambda!`
+
+`(lambda! (arg1 arg2 ... argN) body)`
+
+Creates an anonymous function that takes arguments `arg1`, `arg2`, ... `argN` and returns the result of evaluating `body`.
+
+#### Examples
+
+```
+((lambda! (x y) (+ x y)) 1 2)
+=> 3
+((lambda! (f x) (f (f x))) (lambda! (n) (+ n 1)) 1)
+=> 3
+```
+
 ### `set!`
 
 `(set! name value)`
