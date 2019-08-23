@@ -24,7 +24,11 @@ pub enum MankaiObject {
     Bool(bool),
     SpecialForm(fn(&mut Interpreter, Vec<&Sexp>) -> Result<MankaiObject, RuntimeError>),
     Native(fn(Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError>),
-    // Function (user defined)
+    Function {
+        name: Option<String>,
+        arguments_identifiers: Vec<Token>,
+        body: Sexp,
+    },
 }
 
 impl std::fmt::Debug for MankaiObject {
@@ -46,6 +50,7 @@ impl std::fmt::Debug for MankaiObject {
             MankaiObject::Bool(false) => write!(f, "false"),
             MankaiObject::SpecialForm(_) => write!(f, "special form"),
             MankaiObject::Native(_) => write!(f, "native function"),
+            MankaiObject::Function { .. } => write!(f, "user-defined function"),
         }
     }
 }
@@ -71,6 +76,7 @@ impl PartialEq for MankaiObject {
             },
             MankaiObject::SpecialForm(_) => false,
             MankaiObject::Native(_) => false,
+            MankaiObject::Function { .. } => false,
         }
     }
 }
@@ -96,6 +102,7 @@ impl ToString for MankaiObject {
             MankaiObject::Bool(false) => String::from("false"),
             MankaiObject::SpecialForm(_) => String::from("<special form>"),
             MankaiObject::Native(_) => String::from("<native function>"),
+            MankaiObject::Function { .. } => String::from("<user-defined function>"),
         }
     }
 }
@@ -104,9 +111,47 @@ impl MankaiObject {
     /// Call the object with arguments.
     /// It the object is a function call it, if it's something else report a
     /// runtime error.
-    fn call(&self, arguments: Vec<MankaiObject>) -> Result<MankaiObject, RuntimeError> {
+    fn call(
+        &self,
+        interpreter: &mut Interpreter,
+        arguments: Vec<MankaiObject>,
+    ) -> Result<MankaiObject, RuntimeError> {
         match self {
             MankaiObject::Native(function) => function(arguments),
+            MankaiObject::Function {
+                name,
+                arguments_identifiers,
+                body,
+            } => {
+                // Arity check.
+                if arguments_identifiers.len() != arguments.len() {
+                    let function_name = match name {
+                        Some(string) => string,
+                        None => "anonymous function",
+                    };
+
+                    return Err(RuntimeError::new(&format!(
+                        "found {} arguments but '{}' requires {}!",
+                        arguments.len(),
+                        function_name,
+                        arguments_identifiers.len()
+                    )));
+                }
+
+                // Extend the environment.
+                interpreter.environment.extend();
+
+                for (identifier, value) in arguments_identifiers.iter().zip(arguments.iter()) {
+                    interpreter.environment.define(identifier, value.clone());
+                }
+
+                // Evaluate the body of the function.
+                let result = interpreter.evaluate(body);
+
+                // Restrict the environment and return.
+                interpreter.environment.restrict();
+                result
+            }
             _ => Err(RuntimeError::new(&format!(
                 "'{}' is not callable!",
                 self.to_string()
@@ -131,7 +176,11 @@ impl Default for Interpreter {
     fn default() -> Self {
         Interpreter {
             environment: Environment::new(),
-            special_forms: vec![String::from("if!"), String::from("set!")],
+            special_forms: vec![
+                String::from("if!"),
+                String::from("lambda!"),
+                String::from("set!"),
+            ],
             native_functions: vec![
                 String::from("+"),
                 String::from("-"),
@@ -209,7 +258,7 @@ impl Interpreter {
                 }
 
                 // Call the function.
-                callee.call(evaluated_arguments)
+                callee.call(self, evaluated_arguments)
             }
         }
     }
@@ -227,11 +276,11 @@ impl Interpreter {
 mod interpreter_test {
     use super::{Interpreter, MankaiObject};
     use crate::lexer::Lexer;
-    use crate::parser::Parser;
+    use crate::parser::{Parser, Sexp};
     use crate::token::*;
 
     #[test]
-    fn atom_evaluating() {
+    fn atom_evaluation() {
         // Number literal.
         let mut lexer = Lexer::new(String::from("5"));
         if let Err(err) = lexer.scan() {
@@ -335,6 +384,43 @@ mod interpreter_test {
         match parser.parse() {
             Ok(expr) => match interpreter.evaluate(&expr) {
                 Ok(value) => assert_eq!(value, MankaiObject::String(String::from("bar"))),
+                Err(err) => panic!(err.message),
+            },
+            Err(err) => panic!(err.message),
+        }
+    }
+
+    #[test]
+    fn anonymous_function_call() {
+        let mut lexer = Lexer::new(String::from("(my-addition 1 2)"));
+        if let Err(err) = lexer.scan() {
+            panic!(err.message);
+        }
+
+        let mut parser = Parser::new(lexer.tokens);
+        let mut interpreter = Interpreter::new();
+
+        // Bring to scope "my-addition": a function that performs addition of
+        // two numbers using the native '+'.
+        interpreter.environment.define(
+            &Token::new(String::from("my-addition"), TokenKind::Identifier),
+            MankaiObject::Function {
+                name: Some(String::from("my-addition")),
+                arguments_identifiers: vec![
+                    Token::new(String::from("first"), TokenKind::Identifier),
+                    Token::new(String::from("second"), TokenKind::Identifier),
+                ],
+                body: Sexp::List(vec![
+                    Sexp::Atom(Token::new(String::from("+"), TokenKind::Identifier)),
+                    Sexp::Atom(Token::new(String::from("first"), TokenKind::Identifier)),
+                    Sexp::Atom(Token::new(String::from("second"), TokenKind::Identifier)),
+                ]),
+            },
+        );
+
+        match parser.parse() {
+            Ok(expr) => match interpreter.evaluate(&expr) {
+                Ok(value) => assert_eq!(value, MankaiObject::Number(3.0)),
                 Err(err) => panic!(err.message),
             },
             Err(err) => panic!(err.message),

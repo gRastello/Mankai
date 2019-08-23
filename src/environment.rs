@@ -26,6 +26,12 @@ impl Environment {
             if_special_form,
         );
 
+        let lambda = MankaiObject::SpecialForm(special_forms::lambda);
+        environment.define(
+            &Token::new(String::from("lambda!"), TokenKind::Identifier),
+            lambda,
+        );
+
         let set = MankaiObject::SpecialForm(special_forms::set);
         environment.define(
             &Token::new(String::from("set!"), TokenKind::Identifier),

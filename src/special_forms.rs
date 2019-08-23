@@ -25,6 +25,56 @@ pub fn if_special_form(
     }
 }
 
+/// The `lambda!` special form. Returns a Mankai function.
+pub fn lambda(
+    _interpreter: &mut Interpreter,
+    arguments: Vec<&Sexp>,
+) -> Result<MankaiObject, RuntimeError> {
+    // Arity check.
+    if arguments.len() != 2 {
+        return Err(RuntimeError::new(
+            "'lambda!' requires exactly two arguments!",
+        ));
+    }
+
+    // Get vector of identifiers for the arguments of the function.
+    let mut arguments_identifiers = Vec::new();
+    let arguments_raw = match arguments.get(0).unwrap() {
+        Sexp::List(list) => list,
+        _ => return Err(RuntimeError::new("1st argumeth")),
+    };
+    for (i, identifier) in arguments_raw.iter().enumerate() {
+        match identifier {
+            Sexp::Atom(token) => {
+                if let TokenKind::Identifier = token.kind {
+                    arguments_identifiers.push(token.clone());
+                } else {
+                    return Err(RuntimeError::new(&format!(
+                        "{}th argument is not an identifier!",
+                        i + 1
+                    )));
+                }
+            }
+            _ => {
+                return Err(RuntimeError::new(&format!(
+                    "Expected list of arguments: {}th argument is not an identifier!",
+                    i + 1
+                )));
+            }
+        }
+    }
+
+    // Get the body of the function.
+    let body = (*arguments.get(1).unwrap()).clone();
+
+    // Return the function.
+    Ok(MankaiObject::Function {
+        name: None,
+        arguments_identifiers,
+        body,
+    })
+}
+
 /// The `set!` special form.
 pub fn set(
     interpreter: &mut Interpreter,
