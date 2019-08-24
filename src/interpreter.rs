@@ -177,6 +177,7 @@ impl Default for Interpreter {
         Interpreter {
             environment: Environment::new(),
             special_forms: vec![
+                String::from("define!"),
                 String::from("if!"),
                 String::from("lambda!"),
                 String::from("set!"),

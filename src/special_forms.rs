@@ -1,6 +1,85 @@
 use crate::interpreter::*;
 use crate::parser::Sexp;
-use crate::token::TokenKind;
+use crate::token::*;
+
+/// The 'defun!' special form.
+pub fn defun(
+    interpreter: &mut Interpreter,
+    arguments: Vec<&Sexp>,
+) -> Result<MankaiObject, RuntimeError> {
+    // Arity check.
+    if arguments.len() != 3 {
+        return Err(RuntimeError::new(
+            "'defun!' requires exactly three arguments!",
+        ));
+    }
+
+    // Get name for the function.
+    let name = match arguments.get(0).unwrap() {
+        Sexp::Atom(token) => {
+            if let TokenKind::Identifier = token.kind {
+                token.lexeme.clone()
+            } else {
+                return Err(RuntimeError::new(
+                    "1st argument to 'defun!' must be an identifier!",
+                ));
+            }
+        }
+        _ => {
+            return Err(RuntimeError::new(
+                "1st argument to 'defun!' must be an identifier!",
+            ))
+        }
+    };
+
+    // Get vector of identifiers for the arguments of the function.
+    let mut arguments_identifiers = Vec::new();
+    let arguments_raw = match arguments.get(1).unwrap() {
+        Sexp::List(list) => list,
+        _ => {
+            return Err(RuntimeError::new(
+                "2nd argument to 'defun!' must be a list of identifiers!",
+            ))
+        }
+    };
+    for (i, identifier) in arguments_raw.iter().enumerate() {
+        match identifier {
+            Sexp::Atom(token) => {
+                if let TokenKind::Identifier = token.kind {
+                    arguments_identifiers.push(token.clone());
+                } else {
+                    return Err(RuntimeError::new(&format!(
+                        "{}th argument is not an identifier!",
+                        i + 1
+                    )));
+                }
+            }
+            _ => {
+                return Err(RuntimeError::new(&format!(
+                    "Expected list of arguments: {}th argument is not an identifier!",
+                    i + 1
+                )));
+            }
+        }
+    }
+
+    // Get the body of the function.
+    let body = (*arguments.get(2).unwrap()).clone();
+
+    // Construct the function
+    let function = MankaiObject::Function {
+        name: Some(name.clone()),
+        arguments_identifiers,
+        body,
+    };
+    let function_clone = function.clone();
+
+    // Bind the newly created function to its name.
+    interpreter
+        .environment
+        .define(&Token::new(name, TokenKind::Identifier), function);
+    Ok(function_clone)
+}
 
 /// The `if!` special form.
 pub fn if_special_form(

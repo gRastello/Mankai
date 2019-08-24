@@ -20,6 +20,12 @@ impl Environment {
         environment.layers.push(HashMap::new());
 
         // Bring to scope some special forms.
+        let defun = MankaiObject::SpecialForm(special_forms::defun);
+        environment.define(
+            &Token::new(String::from("defun!"), TokenKind::Identifier),
+            defun,
+        );
+
         let if_special_form = MankaiObject::SpecialForm(special_forms::if_special_form);
         environment.define(
             &Token::new(String::from("if!"), TokenKind::Identifier),
