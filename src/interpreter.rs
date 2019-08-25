@@ -178,9 +178,9 @@ impl Default for Interpreter {
             environment: Environment::new(),
             special_forms: vec![
                 String::from("define!"),
+                String::from("defun!"),
                 String::from("if!"),
                 String::from("lambda!"),
-                String::from("set!"),
             ],
             native_functions: vec![
                 String::from("+"),
@@ -358,8 +358,8 @@ mod interpreter_test {
     }
 
     #[test]
-    fn set_special_form() {
-        let mut lexer = Lexer::new(String::from("(set! foo \"bar\")"));
+    fn define_special_form() {
+        let mut lexer = Lexer::new(String::from("(define! foo \"bar\")"));
         if let Err(err) = lexer.scan() {
             panic!(err.message);
         }

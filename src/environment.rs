@@ -19,6 +19,12 @@ impl Environment {
         let mut environment = Environment::default();
         environment.layers.push(HashMap::new());
 
+        let define = MankaiObject::SpecialForm(special_forms::define);
+        environment.define(
+            &Token::new(String::from("define!"), TokenKind::Identifier),
+            define,
+        );
+
         // Bring to scope some special forms.
         let defun = MankaiObject::SpecialForm(special_forms::defun);
         environment.define(
@@ -36,12 +42,6 @@ impl Environment {
         environment.define(
             &Token::new(String::from("lambda!"), TokenKind::Identifier),
             lambda,
-        );
-
-        let set = MankaiObject::SpecialForm(special_forms::set);
-        environment.define(
-            &Token::new(String::from("set!"), TokenKind::Identifier),
-            set,
         );
 
         // Bring to scope some native functions.

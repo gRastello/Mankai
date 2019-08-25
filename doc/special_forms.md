@@ -9,11 +9,11 @@ A _special form_ in Mankai is a form to which special evaluation rules apply. _S
 
 Define a function named `fname` that takes arguments `arg`, `arg2`, ..., `argN` and returns the result of evaluating `body`.
 
-#### `defun!` vs `set!` and `lambda!`
-You can achieve a similar result by binding the result of a `lambda!` expression with `set!`. However using `defun!` is preferred since it will give better error messages:
+#### `defun!` vs `define!` and `lambda!`
+You can achieve a similar result by binding the result of a `lambda!` expression with `define!`. However using `defun!` is preferred since it will give better error messages:
 
 ```
-(set! f (lambda! (n) (+ n 1)))
+(define! f (lambda! (n) (+ n 1)))
 => <user-defined function>
 (f)
 Runtime error: found 0 arguments but 'anonymous function' requires 1!
@@ -64,37 +64,37 @@ Creates an anonymous function that takes arguments `arg1`, `arg2`, ... `argN` an
 => 3
 ```
 
-### `set!`
+### `define!`
 
-`(set! name value)`
+`(define! name value)`
 
 Binds `name` to the result of evaluating `value`.
 
 #### Examples
 
-You can use `set!` to create variables to hold any kind of value:
+You can use `define!` to create variables to hold any kind of value:
 
 ```
-(set! foo 2)
+(define! foo 2)
 => 2
 (+ 1 foo)
 => 3
-(set! bar (+ 1 2))
+(define! bar (+ 1 2))
 => 3
 bar
 => 3
 ```
 
-You can even use `set!` to create variables to hold functions or special forms:
+You can even use `define!` to create variables to hold functions or special forms:
 
 ```
-(set! my-multiplication *)
+(define! my-multiplication *)
 => <native function>
 (my-multiplication 2 2 3)
 => 12
-(set! my-set set!)
+(define! my-define define!)
 => <special form>
-(my-set foo 3)
+(my-define foo 3)
 => 3
 foo
 => 3

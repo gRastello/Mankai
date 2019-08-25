@@ -154,8 +154,8 @@ pub fn lambda(
     })
 }
 
-/// The `set!` special form.
-pub fn set(
+/// The `define!` special form.
+pub fn define(
     interpreter: &mut Interpreter,
     arguments: Vec<&Sexp>,
 ) -> Result<MankaiObject, RuntimeError> {
