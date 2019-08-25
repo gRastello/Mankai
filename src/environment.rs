@@ -186,6 +186,23 @@ impl Environment {
         )))
     }
 
+    /// Set the value of a variable in the environment.
+    pub fn set(&mut self, identifier: &Token, value: MankaiObject) -> Result<(), RuntimeError> {
+        // Start searching for the key from the outermost layer.
+        for layer in self.layers.iter_mut().rev() {
+            if layer.contains_key(&identifier.lexeme) {
+                layer.insert(identifier.lexeme.clone(), value);
+                return Ok(());
+            }
+        }
+
+        // If nothing is found return a runtime error.
+        Err(RuntimeError::new(&format!(
+            "cannot assign to undefined symbol '{}'",
+            identifier.lexeme
+        )))
+    }
+
     /// Extend the environment with a new layer.
     pub fn extend(&mut self) {
         self.layers.push(HashMap::new());
@@ -295,6 +312,48 @@ mod environment_test {
         match environment.get(&Token::new(String::from("bar"), TokenKind::Identifier)) {
             Ok(value) => assert_eq!(value, MankaiObject::String(String::from("baz"))),
             Err(err) => panic!(err.message),
+        }
+    }
+
+    #[test]
+    fn setting() {
+        let mut environment = Environment::new();
+
+        // Put something in the environment.
+        environment.define(
+            &Token::new(String::from("foo"), TokenKind::Identifier),
+            MankaiObject::Number(6.0),
+        );
+
+        // Extend the environment, set something again.
+        environment.extend();
+
+        if let Err(err) = environment.set(
+            &Token::new(String::from("foo"), TokenKind::Identifier),
+            MankaiObject::Number(7.0),
+        ) {
+            panic!(err.message);
+        }
+
+        match environment.get(&Token::new(String::from("foo"), TokenKind::Identifier)) {
+            Ok(value) => assert_eq!(value, MankaiObject::Number(7.0)),
+            Err(err) => panic!(err.message),
+        }
+
+        // Back out of the extended environment.
+        environment.restrict();
+
+        match environment.get(&Token::new(String::from("foo"), TokenKind::Identifier)) {
+            Ok(value) => assert_eq!(value, MankaiObject::Number(7.0)),
+            Err(err) => panic!(err.message),
+        }
+
+        // Check that the runtime error for the set method works.
+        if let Ok(()) = environment.set(
+            &Token::new(String::from("bar"), TokenKind::Identifier),
+            MankaiObject::Number(3.0),
+        ) {
+            panic!("expected runtime error. Cannot assign to an undefined symbol!");
         }
     }
 }
