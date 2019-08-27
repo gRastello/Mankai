@@ -3,6 +3,42 @@ A _special form_ in Mankai is a form to which special evaluation rules apply. _S
 
 ## List of special forms
 
+### `define!`
+
+`(define! name value)`
+
+Binds `name` to the result of evaluating `value`.
+
+#### Examples
+
+You can use `define!` to create variables to hold any kind of value:
+
+```
+(define! foo 2)
+=> 2
+(+ 1 foo)
+=> 3
+(define! bar (+ 1 2))
+=> 3
+bar
+=> 3
+```
+
+You can even use `define!` to create variables to hold functions or special forms:
+
+```
+(define! my-multiplication *)
+=> <native function>
+(my-multiplication 2 2 3)
+=> 12
+(define! my-define define!)
+=> <special form>
+(my-define foo 3)
+=> 3
+foo
+=> 3
+```
+
 ### `defun!`
 
 `(defun! fname (arg1 arg2 ... argN) body)`
@@ -64,38 +100,21 @@ Creates an anonymous function that takes arguments `arg1`, `arg2`, ... `argN` an
 => 3
 ```
 
-### `define!`
+### `set!`
 
-`(define! name value)`
+`(set! name value)`
 
-Binds `name` to the result of evaluating `value`.
+Assign `value` to `name`. Used to change the value of variables created with `set!`. If `name` is not bound then `set!` produces a runtime error so you always need to first declare `name` with `define!`.
 
 #### Examples
 
-You can use `define!` to create variables to hold any kind of value:
-
 ```
-(define! foo 2)
-=> 2
-(+ 1 foo)
-=> 3
-(define! bar (+ 1 2))
-=> 3
-bar
-=> 3
-```
-
-You can even use `define!` to create variables to hold functions or special forms:
-
-```
-(define! my-multiplication *)
-=> <native function>
-(my-multiplication 2 2 3)
-=> 12
-(define! my-define define!)
-=> <special form>
-(my-define foo 3)
+(define! foo 3)
 => 3
 foo
 => 3
+(set! foo 6)
+=> 6
+foo
+=> 6
 ```

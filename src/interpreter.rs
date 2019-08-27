@@ -181,6 +181,7 @@ impl Default for Interpreter {
                 String::from("defun!"),
                 String::from("if!"),
                 String::from("lambda!"),
+                String::from("set!"),
             ],
             native_functions: vec![
                 String::from("+"),

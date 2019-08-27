@@ -44,6 +44,12 @@ impl Environment {
             lambda,
         );
 
+        let set = MankaiObject::SpecialForm(special_forms::set);
+        environment.define(
+            &Token::new(String::from("set!"), TokenKind::Identifier),
+            set,
+        );
+
         // Bring to scope some native functions.
         let sum = MankaiObject::Native(native_functions::sum);
         environment.define(&Token::new(String::from("+"), TokenKind::Identifier), sum);
